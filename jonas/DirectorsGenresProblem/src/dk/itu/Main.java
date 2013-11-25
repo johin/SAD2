@@ -11,62 +11,26 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Connection con = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        String url = "jdbc:mysql://localhost:3306/imdb";
-        String user = "root";
-        String password = "geekchamp3!";
-
-        try {
-            con = DriverManager.getConnection(url, user, password);
-            pst = con.prepareStatement("SELECT * FROM directors");
-            rs = pst.executeQuery();
-
-            /*while (rs.next()) {
-                System.out.print(rs.getInt(1));
-                System.out.print(": ");
-                System.out.println(rs.getString(2).concat(" ").concat(rs.getString(3)));
-            } */
-
-        } catch (SQLException ex) {
-            Logger lgr = Logger.getLogger(Main.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pst != null) {
-                    pst.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-
-            } catch (SQLException ex) {
-                Logger lgr = Logger.getLogger(Main.class.getName());
-                lgr.log(Level.WARNING, ex.getMessage(), ex);
-            }
-        }
-
         // test set cover algorithm
-        Integer[] genres = {1,5,9,2,4,10,34,62,29,50,38};
-        Integer[][] genreSets = {{1,5,9,38},{34,1,9},{4,10,62},{2,29,50},{38,29,50,62,1,5,9},{1,5,34,4,10,2}};
+        //Integer[] genres = {1,5,9,2,4,10,34,62,29,50,38};
+        //Integer[][] genreSets = {{1,5,9,38},{34,1,9},{4,10,62},{2,29,50},{38,29,50,62,1,5,9},{1,5,34,4,10,2}};
 
         Main m = new Main();
 
-        List result = m.greedySetCover(genres, genreSets);
-        System.out.print(Arrays.toString(result.toArray()));
+        Set genres = Imdb.getGenres();
+        //Director[] directors = (Director[]) Imdb.getDirectors().values().toArray();
+        List<Director> directors = new ArrayList<Director>(Imdb.getDirectors().values());
+        //System.out.print(Imdb.getDirectors().values());
+
+        List<Director> result = m.greedySetCover(genres, directors);
+        System.out.println("Set(s) covering all genres:");
+        for(Director d : result) {
+            System.out.println(d.getName().concat(" (").concat(Integer.toString(d.getId())).concat(") ").concat(" : ").concat(d.getGenres().toString()));
+        }
+
     }
 
-    private void parseFromDB() {
-
-    }
-
-    private List greedySetCover(Integer[] X, Integer[][] F) {
+    /*private List greedySetCover(Integer[] X, Integer[][] F) {
         // convert arrays to sets
         Set<Integer> x = new HashSet<Integer>(Arrays.asList(X));
         ArrayList<Set<Integer>> f = new ArrayList<Set<Integer>>();
@@ -77,28 +41,34 @@ public class Main {
         lgr.log(Level.INFO, "Genres are: ".concat(Arrays.toString(x.toArray())));
         lgr.log(Level.INFO, "Genre sets are: ".concat(Arrays.toString(f.toArray())));
         return greedySetCover(x,f);
-    }
+    }*/
 
-    private List greedySetCover(Set<Integer> X, List<Set<Integer>> F) {
-        Set<Integer> U = X;
-        ArrayList<Set<Integer>> C = new ArrayList<Set<Integer>>();
+    private List<Director> greedySetCover(Set<String> X, List<Director> F) {
+        Set<String> U = X;
+        //ArrayList<Set<String>> C = new ArrayList<Set<String>>();
+        ArrayList<Director> C = new ArrayList<Director>();
         while(U.size() > 0) {
             // greedy step: maximize union of U and S(in F)
             lgr.log(Level.INFO, "Maximizing; U is now of size: ".concat(Integer.toString(U.size())));
-            Set<Integer> V = new HashSet<Integer>(U);
-            Set<Integer> s = null;
-            for(Set<Integer> S : F) {
-                Set<Integer> v = new HashSet<Integer>(U);
+            Set<String> V = new HashSet<String>(U);
+            //Set<String> s = null;
+            Director d = null;
+            for(Director D : F) {
+                Set<String> v = new HashSet<String>(U);
+                Set S = D.getGenres();
+                //lgr.log(Level.INFO, "Missing genres: ".concat(U.toString()));
+                //lgr.log(Level.INFO, "Examining genres: ".concat(D.getGenres().toString()));
                 v.removeAll(S);
                 if(v.size() < V.size()) {
                     V = v;
-                    s = S;
+                    //s = S;
+                    d = D;
                 }
             }
             // update U, remove genres from U that is in S
             U = V;
-            // update C, add genres from S
-            C.add(s);
+            // update C, add genre set
+            C.add(d);
         }
         return C;
     }
