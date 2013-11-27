@@ -31,16 +31,16 @@ public class MaxMatching2 {
   }
 
   // Usage example
-  public static void main(String[] args) {
-    int n1 = 2;
-    int n2 = 3;
-    List<Integer>[] g = new List[n1];
-    for (int i = 0; i < n1; i++) {
-      g[i] = new ArrayList<Integer>();
-    }
-    g[0].add(2);
-    g[0].add(0);
-    g[1].add(2);
-    System.out.println(2 == maxMatching(g, n2));
-  }
+ // public static void main(String[] args) {
+ //   int n1 = 2;
+ //   int n2 = 3;
+ //   List<Integer>[] g = new List[n1];
+ //   for (int i = 0; i < n1; i++) {
+ //     g[i] = new ArrayList<Integer>();
+ //   }
+ //   g[0].add(2);
+ //   g[0].add(0);
+ //   g[1].add(2);
+ //   System.out.println(2 == maxMatching(g, n2));
+ // }
 }

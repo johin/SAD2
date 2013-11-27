@@ -4,62 +4,67 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+//import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
-import java.util.HashMap;
+//import java.util.Map;
+//import java.util.HashMap;
 
 public class MySQLConnector {
+	
 	private Connection connect = null;
 	private Statement statement = null;
-	private PreparedStatement preparedstatement = null;
+	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
-	private Map<Integer , Actor> maleActors;
-	private Map<Integer , Actor> femaleActors;
 	
-	public void readDatabase() throws Exception {
+	public ResultSet readMovies(String connString, float rank){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
-			
-			connect = DriverManager.getConnection("jdbc:mysql://localhost/imdb?"
-					+ "user=root&password=tattoo3s");
-			
-			statement = connect.createStatement();
-			
-			resultSet = statement.executeQuery("Select * from actors where gender like 'M'");
-			
-			maleActors = writeResultSet(resultSet);
-			
-			//resultSet = null;
-			
-			resultSet = statement.executeQuery("Select * from actors where gender like 'F'");
-			
-			femaleActors = writeResultSet(resultSet);
-			
-			System.out.println("DEUG");
-			
+			connect = DriverManager.getConnection(connString);
+		      preparedStatement = connect
+		          .prepareStatement("SELECT * FROM imdb.movies where rank > ? ; ");
+		      preparedStatement.setFloat(1, rank);
+		      resultSet = preparedStatement.executeQuery();
+
+			return resultSet;
 		}
 		catch(Exception ex){
-			System.out.println(ex.getMessage());
-		}
+		
+			return null;
+		}		
 	}
 	
-	 private Map<Integer, Actor> writeResultSet(ResultSet resultSet) throws SQLException {
-		 Map<Integer, Actor> destMap = new HashMap<Integer, Actor>();
-		 while (resultSet.next()) {
-			 destMap.put(resultSet.getInt("id"), new Actor(resultSet.getInt("id"), resultSet.getInt("film_count"), resultSet.getString("first_name"), resultSet.getString("last_name"), resultSet.getString("gender")));
-			 //int id = resultSet.getInt("id");
-			 //String firstName = resultSet.getString("first_name");
-			 //String lastName = resultSet.getString("last_name");
-			 //String gender = resultSet.getString("gender");
-			 //int filmCount = resultSet.getInt("film_count");
-			 //System.out.println("first name: " + firstName);
-			 //System.out.println("last name: " + lastName);
-			 //System.out.println("gender: " + gender);
-			 //System.out.println("id: " + id);
-			 //System.out.println("film count: " + filmCount);
-		 }
-		 
-		 return destMap;
-	 }
+	public ResultSet readActors(String connString, int movieId){
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection(connString);
+		      preparedStatement = connect
+		          .prepareStatement("SELECT id, first_name, last_name, gender, film_count, role FROM imdb.actors actors LEFT OUTER JOIN imdb.roles roles ON actors.id=roles.actor_id WHERE roles.movie_id = ? ; ");
+		      preparedStatement.setInt(1, movieId);
+		      resultSet = preparedStatement.executeQuery();
+
+			return resultSet;
+		}
+		catch(Exception ex){
+		
+			return null;
+		}		
+	}
+	
+	 public void close() {
+		    try {
+		      if (resultSet != null) {
+		        resultSet.close();
+		      }
+
+		      if (statement != null) {
+		        statement.close();
+		      }
+
+		      if (connect != null) {
+		        connect.close();
+		      }
+		    } catch (Exception e) {
+
+		    }
+		  }
 }
