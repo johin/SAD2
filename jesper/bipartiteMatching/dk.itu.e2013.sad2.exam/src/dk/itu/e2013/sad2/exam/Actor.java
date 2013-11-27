@@ -17,7 +17,7 @@ public class Actor {
 		this.film_count = filmCount;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.role = role;
+//		this.role = role;
 	}
 	
 	//Getters
