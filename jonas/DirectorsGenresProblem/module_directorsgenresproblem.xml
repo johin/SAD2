@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_directorsgenresproblem" default="compile.module.directorsgenresproblem">
+  <dirname property="module.directorsgenresproblem.basedir" file="${ant.file.module_directorsgenresproblem}"/>
+  
+  <property name="module.jdk.home.directorsgenresproblem" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.directorsgenresproblem" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.directorsgenresproblem" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.directorsgenresproblem" value="${compiler.args}"/>
+  
+  <property name="directorsgenresproblem.output.dir" value="${module.directorsgenresproblem.basedir}/out/production/DirectorsGenresProblem"/>
+  <property name="directorsgenresproblem.testoutput.dir" value="${module.directorsgenresproblem.basedir}/out/test/DirectorsGenresProblem"/>
+  
+  <path id="directorsgenresproblem.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="directorsgenresproblem.module.production.classpath">
+    <path refid="${module.jdk.classpath.directorsgenresproblem}"/>
+    <path refid="library.mysql-connector-java-5.1.27-bin.classpath"/>
+  </path>
+  
+  <path id="directorsgenresproblem.runtime.production.module.classpath">
+    <pathelement location="${directorsgenresproblem.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.27-bin.classpath"/>
+  </path>
+  
+  <path id="directorsgenresproblem.module.classpath">
+    <path refid="${module.jdk.classpath.directorsgenresproblem}"/>
+    <pathelement location="${directorsgenresproblem.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.27-bin.classpath"/>
+  </path>
+  
+  <path id="directorsgenresproblem.runtime.module.classpath">
+    <pathelement location="${directorsgenresproblem.testoutput.dir}"/>
+    <pathelement location="${directorsgenresproblem.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.27-bin.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.directorsgenresproblem">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.directorsgenresproblem">
+    <patternset refid="excluded.from.module.directorsgenresproblem"/>
+  </patternset>
+  
+  <path id="directorsgenresproblem.module.sourcepath">
+    <dirset dir="${module.directorsgenresproblem.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.directorsgenresproblem" depends="compile.module.directorsgenresproblem.production,compile.module.directorsgenresproblem.tests" description="Compile module DirectorsGenresProblem"/>
+  
+  <target name="compile.module.directorsgenresproblem.production" depends="register.custom.compilers" description="Compile module DirectorsGenresProblem; production classes">
+    <mkdir dir="${directorsgenresproblem.output.dir}"/>
+    <javac2 destdir="${directorsgenresproblem.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.directorsgenresproblem}/javac">
+      <compilerarg line="${compiler.args.directorsgenresproblem}"/>
+      <bootclasspath refid="directorsgenresproblem.module.bootclasspath"/>
+      <classpath refid="directorsgenresproblem.module.production.classpath"/>
+      <src refid="directorsgenresproblem.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.directorsgenresproblem"/>
+    </javac2>
+    
+    <copy todir="${directorsgenresproblem.output.dir}">
+      <fileset dir="${module.directorsgenresproblem.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.directorsgenresproblem.tests" depends="register.custom.compilers,compile.module.directorsgenresproblem.production" description="compile module DirectorsGenresProblem; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.directorsgenresproblem" description="cleanup module">
+    <delete dir="${directorsgenresproblem.output.dir}"/>
+    <delete dir="${directorsgenresproblem.testoutput.dir}"/>
+  </target>
+</project>

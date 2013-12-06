@@ -1,0 +1,283 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,tabularx}
+%\usepackage[margin=2.5cm,a4paper]{geometry}
+\usepackage[a4paper]{geometry}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+
+\title{Searching for cliques in a world of actors}
+\author{Jonas Hinge (jhin), Thomas Snaidero (tsna), Jesper Jensen (jejen)}
+\date{November 2013}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Academy Awards is covered by thousands of journalists who need tools to find interesting trivia of interest to their audience. In this project, we will create such a tool for finding specific information or gossip. The information to be found will have complex problem characteristics, and will be derived from a big dataset, thus efficient algorithms are required.
+
+\subsection{A note about social networks}
+The term social network dates back to the late 1800s, both Émile Durkheim and Ferdinand Tönnies foreshadowed the idea of social networks in their theories and research of social groups. Tönnies argued that social groups can exist as personal and direct social ties that either link individuals who share values and belief (Gemeinschaft, German, commonly translated as "community") or impersonal, formal, and instrumental social links (Gesellschaft, German, commonly translated as "society"). \\
+
+Fast forward to today, the term social network has become mainstream, with the ubiquitous trend of socializing any web service. Speaking at the Facebook f8 event in May 2007, CEO Mark Zuckerberg used the term "social graph" to refer to the network of connections and relationships between site users. Zuckerberg said that "it's the reason Facebook works". He went on to say the social graph is "changing the way the world works... As Facebook adds more and more people with more and more connections, it continues growing and becomes more useful at a faster rate." \cite{socialgraphwiki} \\
+
+%JEJEN - Skriv overgang fra social network til communities, vækst af netværk og grafer samt eventuel problematik
+
+\subsection{Tight communities}
+It could be interesting to investigate the communities or cliques of actors in the movie business. Are there groups of actors that stick together when it comes to picking roles and how frequently have they appeared together?
+
+%The clique problem is a known problem - especially in social networks. Consider a social graph where the vertices represent people and the edges the friendship or relation between two people. Now the clique problems refers to finding a particular complete subgraph where each pair of vertices are connected. But could this social network model be applied to actors playing together in different movies? If we now consider that such a graphs vertices are actors and the edges are acquaintances through movies i.e. if two actors have played together they are connected. Could this tell us something about cliques in the movie business? And further considering adding weights to the edges which could be the number of movies two actors have appeared in, would this tell us something about groups of actors sticking together when picking roles?
+
+The local clustering coefficient of a node in a social network is a measure that quantifies how tightly-knit the community is around the node. The computation of the clustering coefficient can be reduced to counting the number of triangles incident on the particular node in the network. If the graph is too big to fit into the memory of a given computer, the computation is not a trivial task \cite{countingTriangles}. To perform the computation on big datasets, parallel computation, spanning multiple computers is needed. 
+% MapReduce is more and more becoming the de facto standard for parallel computation.
+
+In this assignment we will use a triangle counting algorithm \cite{triangleCounting} to compute the local cluster coefficient. By extending the algorithm to include weights of the edges, we are able to quantify how tightly-knit the communities are. E.g. look at Stallone, Schwarzenegger and Statham as a community (based on they all appear in "The expendables I and II"). By keeping track of how many movies eg. Stallone, Schwarzenegger and Statham all appears in, we are able to see just how tightly-knit their community is. This is useful for the reporter on the red carpet at the academy awards. It will provide a list of which actors are appropriate to interview together or to ask for gossip on the others in the community, assuming that not so tightly-knit communities would have less stories to tell including the other actors in the community.
+
+\section{Preliminaries}
+
+\subsection{Basic notations}
+Let $G = (V,E)$ be an undirected simple graph (no self-loops and no multiple edges) and let it consist of a set of nodes (vertices) $V$ and a set of edges $E$. TODO: Add more notation definitions
+
+Here, a social network will be defined as a graph, where actors are nodes, and if a given pair of actors have played in the same movie, an edge then connects the two nodes. The number of times a pair of actors have played together, are determining the edge's weight. The resulting graph is thus an undirected, weighted graph.
+
+% REFORMULATE AND ADD MORE NOTATIONS
+
+
+
+\subsection{Clustering coefficient}
+%(TODO) - need more details on clustering coefficient and triangles in total vs triangles incident to a node
+%The global clustering coefficient is based on triplets of nodes. A triplet consists of three nodes that are connected by either two (open triplet) or three (closed triplet) undirected ties. A triangle consists of three closed triplets, one centred on each node. The global clustering coefficient is the number of triplets (or 3 x triangles) over the total number of triplets (both open and closed). The global clustering coefficient is a indication of the clustering in the whole network (global), and can be applied to both directed and undirected networks (often called transitivity)
+
+Watt and Strogatz defined the clustering coefficient as follows, "Suppose that a vertex $v$ has $k_{v}$ neighbours; then at most $\frac{k_{v}(k_{v}-1)}{2}$ edges can exist between them (this occurs when every neighbour of $v$ is connected to every other neighbour of $v$). Let $C_{v}$ denote the fraction of these allowable edges that actually exist. Define $C_{v}$ over all $v$." 
+%The traversiti constant $C$ is defined as:
+%The transitivity ratio is a related concept. It is defined as: \\
+
+%$C = \frac{3 \times \mbox{number of triangles}}{\mbox{number of connected triples of vertices}} = \frac{\mbox{number of closed triplets}}{\mbox{number of connected triples of vertices}}$.\\
+
+%The clustering coefficient places more weight on the low degree nodes, while the transitivity ratio places more weight on the high degree nodes.\cite{clusterCoefficient}
+
+Local clustering coefficient of a node in a graph quantifies how close it's neighbours are to being a clique. Watt and Strogatz introduced the measure in 1998 to determine whether a graph is a {\textit{small-world network}}.
+
+A graph $G=(V,E)$ consists of a set vertices $V$ and edges $E$ between them. An edge $e_{ij}$ connects vertex $v_{i}$ with vertex $v_{j}$. The neighbourhood of $N_{i}$ for vertex $n_{i}$ is defined as it's immediately connected neighbours as follows: $N_{i}=\{v_{i}:e_{ij} \in E \land e_{ij} \in E \} $. We define $k_{i}$ as the number of vertices, $|N_{i}|$, in the neighbourhood, $N_{i}$ of a vertex.
+The local clustering coefficient $C_{i}$ for a vertex $v_{i}$ is then given by the proportion of links between the vertices within its neighbourhood divided by the number of links that could possibly exist between them. For a directed graph, $e_{ij}$ is distinct from $e_{ji}$, and therefore for each neighbourhood $N_{i}$ there are $k_{i}(k_{i}-1)$ links that could exist among the vertices within the neighbourhood ($k_{i}$ is the number of neighbors of a vertex). Thus, the local clustering coefficient for directed graphs is given as $C_{i} = \frac{|\{e_{jk}: v_{j},v_{k} \in N_{i}, e_{jk} \in E\}|}{k_{i}(k_i-1)}$.
+An undirected graph has the property that $e_{ij}$ and $e_{ji}$ are considered identical. Therefore, if a vertex $v_{i}$ has $k_{i}$ neighbours, $\frac{k_i(k_i-1)}{2}$ edges could exist among the vertices within the neighbourhood. Thus, the local clustering coefficient for undirected graphs can be defined as
+$C_{i} = \frac{2|\{e_{jk}: v_{j},v_{k} \in N_{i}, e_{jk} \in E\}|}{k_{i}(k_{i}-1)}$.
+%Let $\lambda_G(v)$ be the number of triangles on v $\in V(G)$ for undirected graph $G$. That is, $\lambda_G(v)$ is the number of subgraphs of $G$ with 3 edges and 3 vertices, one of which is $v$. Let $\tau_G(v)$ be the number of triples on $v \in G$. That is, $\tau_G(v)$ is the number of subgraphs (not necessarily induced) with 2 edges and 3 vertices, one of which is $v$ and such that $v$ is incident to both edges. Then we can also define the clustering coefficient as
+%$C_{i} = \frac{\lambda_G(v)}{\tau_G(v)}$.
+%It is simple to show that the two preceding definitions are the same, since
+%$\tau_G(v) = C({k_i},2) = \frac{1}{2}k_i(k_i-1)$.
+%These measures are 1 if every neighbour connected to $v_{i}$ is also connected to every other vertex within the neighbourhood, and 0 if no vertex that is connected to $v_{i}$ connects to any other vertex that is connected to $v_{i}$. \cite{clusterCoefficient}
+
+In our implementation we search for sets of nodes with a high $C$. If $C=1$ the community is also called a clique. If $C < 1$ the communities will be allowed to have nodes that are not interconnected with every other node in the community.
+
+% \section{A sequential algorithm for computing the cluster coefficient}
+% Triangle counting has become a widely used tool in network analysis. Due to the efficiency of the algorithms for triangle counting and listing the practicability of triangle counting and listing in very large graphs with various degree distribution.
+% TODO: Reformulate this
+
+
+% \subsection{Counting triangles}
+% The folklore algorithm (NodeIterator) \cite{countingTriangles} iterates over all of the nodes and checks whether any two neighbors of a given node v are themselves connected. Although simple, the algorithm does not perform well in graphs with skewed degree of distributions as a single high degree node can lead to an $O(n^2)$, running time even on sparse graphs. This could be very expensive and not-practical for large massive graphs.
+
+% \subsubsection{NodeIterator++}
+% The folklore algorithm counts each triangle six times and this is improved by Schank [REF] etc...
+
+% TODO: Pseudo code
+
+\section{A sequential algorithm for computing the cluster coefficient}
+% short introduction, count triangles, count total number of possible edges
+
+\subsection{Triangle counting}
+% TSNA: Ref: triangle counting paper, iterator++
+
+\subsection{Computing the denominator}
+% JHIN
+Simple calculation running through all nodes and its adjacent nodes in the graph
+
+\subsection{An algorithm}
+% JHIN - finish him
+Explain algorithm, weights etc...
+% After finding a nodes triangles - we save these nodes in a set for every node in the graph (a dictionary). We can then sum the edges between these nodes and this will then give us a total count for which the actors of that community have played together - some kind of frequency count.
+
+\begin{algorithm}
+\caption{ActorCliques(V,E)}
+\begin{algorithmic}
+\STATE $Cn_{total} \leftarrow dictionary$
+\STATE $Ct_{total} \leftarrow dictionary$
+%\STATE $T_{total} \leftarrow 0$
+\FOR{$v \in V$}
+\STATE $Cn_{v} \leftarrow dictionary$
+\STATE Add $Cn_v$ to $Cn_{total}$
+\STATE $T_{v} \leftarrow 0$
+\FOR{$u \in N(v)$ and $d(u) > d(v)$}
+\FOR{$w \in N(v)$ and $d(w) > d(u)$}
+\IF{$(u,w) \in E$}
+\STATE Add $u, w$ to $Cn_{v}$
+%\STATE $T_{total} \leftarrow T_{total} + 1$
+\STATE $Ct_{total}[v] \leftarrow T_v + 1$
+\ENDIF
+\ENDFOR
+\ENDFOR
+\STATE Compute the denominator (max possible edges between v's neighbours)
+\ENDFOR
+\STATE $Cc_{total} \leftarrow$ Calculate the cluster cofficient for each node
+\RETURN $Cn_{total},Ct_{total},Cc_{total}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Time and space complexity}
+% JHIN
+
+\section{MapReduce}
+
+
+\section{Implementation}
+
+\subsection{Building the weighted social graph}
+
+The imdb database consists of the following tabels:
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.70]{imdb_layout2.png}
+\end{center}
+\caption{\small {\it {IMDB Layout}}} 
+\label{fig:IMDB Layout}
+\end{figure}
+
+To construct the vertices and edges for the social network, we select and join data from multiple tables to populate a dataset that kan be processed into our social network.
+
+The following select statement selects and joins from the movies, roles and actors tabels:
+
+\lstset{numbers=left, frame=single, language=SQL, label=Selectstatement}
+\begin{lstlisting}
+SELECT movie_id, name, rank, year, actor_id, first_name, last_name,
+gender, film_count FROM imdb.movies movies LEFT OUTER JOIN imdb.roles
+roles ON movies.id=roles.movie_id LEFT OUTER JOIN imdb.actors actors 
+ON actors.id=roles.actor_id;
+\end{lstlisting}
+% MYSQL QUERY SKAL RETTES - RANK CONDITION SKAL FJERNES BLA...
+
+To stabilize the dataset all id rows containing 0 or null value is disregarded, result sets with null values are also disregarded.
+
+Based on the reslut set we construct a adjacency list of actors by Adding one element for each actor.
+
+To extend the list of actors to an adjacensy list we add a HashSet for each 
+adjacent actor. The adjacent key,value pair is the actor id of the actor, that have apered in the same movie as the "node" actor, the value is the number of movies in wich they apere together.
+Hence the edges in the graph concists of the HashSets.
+
+Eg.:
+\lstset{numbers=left, language=Java, label=Select statement}
+\begin{lstlisting}
+    Actor[HashSet(998,2), HashSet(3387,6), HashSet(5753,1)] 
+\end{lstlisting}
+
+Based on this graph we are now able to run through all actors looking for communities of actors and the strenght of a given community based on the weights (numbers of movies actors have palyed togehter.) 
+
+\subsection{Algorithm(s) implementation}
+
+
+\subsection{Results}
+
+\section{Discussion}
+
+\section{Conclusion}
+
+\begin{thebibliography}{1}
+
+\bibitem{socialnetworkwiki}
+    wikipedia:
+    \emph{Social network}
+    \url{http://en.wikipedia.org/wiki/Social_network}
+
+\bibitem{socialgraphwiki}
+    wikipedia:
+    \emph{Social graph}
+    \url{http://en.wikipedia.org/wiki/Social_graph}
+    
+\bibitem{clusterCoefficient}
+    wikipedia:
+    \emph{Clustering coefficient}
+    \url{http://en.wikipedia.org/wiki/Clustering_coefficient}
+    
+\bibitem{countingTriangles}
+    Article:
+    \emph{Counting Triangles and the Curse of the Last Reducer}
+    Siddharth Suri,
+    Sergei Vassilvitskii,
+    Yahoo! Research
+\end{thebibliography}
+
+
+\end{document}
+
+
+
+% ---------- POSSIBLE REFERENCES FOR PAPERS ON CLIQUE PROBLEMS ----------
+
+\begin{itemize}
+\item finding the maximum clique (a clique with the largest number of vertices) (THIS COULD BE INTERESTING?)
+\end{itemize}
+
+\begin{itemize}
+\item listing all maximal cliques (cliques that cannot be enlarged)
+\end{itemize}
+
+\begin{itemize}
+\item solving the decision problem of testing whether a graph contains a clique larger than a given size.
+\end{itemize}
+
+k-clique problem (probably the least non-trivial case):
+http://lcavique.no.sapo.pt/publicacoes/KCC.pdf
+
+PLS Algorithm (Frencesco said ok for this one):
+http://www.ict.griffith.edu.au/~s994853/papers/Journal_Tier_2_Second.pdf
+
+Java code for max weighted clique problem (Not sure about algorithm used...):
+http://www.codeforge.com/read/100787/MaximumClique.java__html
+
+% ----------------------------------------
+
+
+% ----------------------------------------
+\subsection{Triangles - definition and Properties}
+Let $G = (V, E)$ be an undirected, simple graph with a set of nodes $V$ and a set of edges $E$. We use the symbol $n$ for the number of nodes and the symbol $m$ for the number of edges. The degree $d(v) := |\{u \in V : \exists \{v, u\} \ E\}|$ of node $v$ is defined to be the number of nodes in $V$ that are adjacent to $v$. The maximal degree of a graph $G$ is defined as $d_{max}(G) = max\{d(v) : v \in V \}$. An n-clique is a complete graph with $n$ nodes. Unless otherwise declared we assume graphs to be connected. \\
+
+A triangle $\Delta = (V_\Delta , E_\Delta)$ of a graph $G = (V, E)$ is a three node subgraph with $V_\Delta = \{u, v, w\} \subset V$ and $E_{\Delta} = \{\{u, v\}, \{v, w\}, \{w, u\}\} \subset E$. We use the symbol $\delta(G)$ to denote the number of triangles in graph G. Note that an n-clique has exactly \scriptsize$\begin{pmatrix}n\\3\end{pmatrix}$ \normalsize triangles and asymptotically $\delta_{clique} \in \theta(n^3)$. In dependency to 3 $m$ we have accordingly $\delta_{clique} \in \theta (m^{3/2})$ and by concentrating as many edges as possible into a clique we get the following lemma: \\
+
+\noindent $\textbf{Lemma 1}$. There exists a graph $G_m$ with $m$ edges, such that $$\delta(G_ m) \in \theta(m^{3/2})$$
+
+\subsection{Finding triangles - algorithm}
+The algorithm edge-iterator iterates over all edges and compares the adjacency data structure of both incident nodes. For an edge {u, w} the nodes {u, v, w} induce a triangle if and only if node v is present in both adjacency data structures Adj(u) and Adj(w). \\
+
+%If the adjacency data Adj(v) is given in a sorted array, we can compare the two adjacencies for an edge {u, w} in d(u) + d(w) time. The sorting can be achieved with a preprocessing step in $v \in V$ $d(v)$ $ln$ $d(v)$ time. We will have to see in the experimental section how this preprocessing influences the overall execution time. For now we will disregard the preprocessing in the running time which can then be expressed with
+
+%$$\sum\limits_{\{u,w\}\in E} d(u)+d(w)$$
+
+\begin{algorithm}
+\caption{edge-iterator}
+\begin{algorithmic}
+\STATE \textbf{Input:} ordered list of vertices (1, . . . , n), Adjacencies Adj(v)
+\STATE \textbf{Data:} Node Data: Adj(v);
+\FOR{$v \in V$}
+\STATE $Adj(v) \leftarrow \emptyset$
+\ENDFOR
+\FOR{$s \in (1, . . . , n)$}
+\FOR{$t \in Adj(s)$}
+\IF{$s < t$}
+\FORALL{$v \in Adj(s) \bigcap Adj(t)$}
+\STATE{output triangle \{v, s, t\};}
+\ENDFOR
+\STATE $Adj(t) \leftarrow  Adj(t) \bigcup \{s\};$
+\ENDIF
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+% ----------------------------------------
+
