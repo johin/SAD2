@@ -21,3 +21,4 @@ target/
 # Other
 *.csv
 *.class
+*.pickle
