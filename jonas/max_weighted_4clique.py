@@ -67,8 +67,18 @@ def optimized_max_edgeweighted_4clique(G):
 	current_clique = ((),-1)
 	triangles = node_iterator_plus_plus(G);
 	#print len(triangles)
-	for tri in triangles:
-		
+	for v,u,w in triangles:
+		v_adj,u_adj,w_adj = G[v].keys(),G[u].keys(),G[w].keys()
+		#union_set = (v_adj.union(u_adj)).union(w_adj)
+		union_list = intersect(intersect(v_adj,u_adj),w_adj)
+		#print union_list
+		if(len(union_list) > 0):
+			for z in union_list:
+				weight = get_clique_weight(G,v,u,w,z)
+				if(weight >= current_clique[1]):
+					print "Found clique: " + "v: " + v + ", u: " + u + ", w: " + w + ", z: " + z
+					print "Weight of clique: " + str(weight)
+					current_clique = ((v,u,w,z),weight)
 	return current_clique
 
 
@@ -88,8 +98,12 @@ def node_iterator_plus_plus(G):
 
 # HELPERS
 def get_clique_weight(adj,v,u,w,z):
-	return adj[v][u] + adj[v][w] + adj[v][z] + adj[u][w] + adj[u][z] + adj[w][z]
+	return min(adj[v][u],adj[v][w],adj[v][z],adj[u][w],adj[u][z],adj[w][z])
+	#return adj[v][u] + adj[v][w] + adj[v][z] + adj[u][w] + adj[u][z] + adj[w][z]
 
+def intersect(a, b):
+    """ return the intersection of two lists """
+    return list(set(a) & set(b))
 
 
 
@@ -112,11 +126,11 @@ print "Finished building graph"
 print "Running algorithm..."
 
 # NAIVE
-#max_clique = naive_max_edgeweighted_4clique(graph)
+max_clique = naive_max_edgeweighted_4clique(graph)
 #pprint(max_clique)
 
 # OPTIMIZED
-optimized_max_edgeweighted_4clique(graph)
+#optimized_max_edgeweighted_4clique(graph)
 
 
 
