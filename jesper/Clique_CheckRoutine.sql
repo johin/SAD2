@@ -1,6 +1,6 @@
 delimiter $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Check4Clique`(
+CREATE DEFINER=`root`@`%` PROCEDURE `Check4Clique`(
 	IN p_actor1 INT(10), 
 	IN p_actor2 INT(10),
 	IN p_actor3 INT(10),
