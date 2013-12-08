@@ -11,19 +11,19 @@ BEGIN
 -- Create temp tabels for results 
  DROP TEMPORARY TABLE if exists TmpActor1;
  CREATE TEMPORARY TABLE TmpActor1 engine=memory (
- 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor1
+ 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor1 AND year >= p_year
  );
  DROP TEMPORARY TABLE if exists TmpActor2;
  CREATE TEMPORARY TABLE TmpActor2 engine=memory (
-	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor2
+	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor2 AND year >= p_year
  );
  DROP TEMPORARY TABLE if exists TmpActor3;
  CREATE TEMPORARY TABLE TmpActor3 engine=memory (
- 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor3
+ 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor3 AND year >= p_year
  );
  DROP  TABLE if exists TmpActor4;
  CREATE TEMPORARY TABLE TmpActor4 engine=memory (
- 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor4
+ 	SELECT actor_id, movie_id, year from imdb.roles roles LEFT OUTER JOIN imdb.movies movies ON movies.id = roles.movie_id where actor_id = p_actor4 AND year >= p_year
  );
 -- Compare and store in new tables
 DROP  TABLE if exists CmpTbl1;
