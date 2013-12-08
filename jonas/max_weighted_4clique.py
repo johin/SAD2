@@ -65,12 +65,21 @@ def naive_max_edgeweighted_4clique(G):
 
 def optimized_max_edgeweighted_4clique(G):
 	current_clique = ((),-1)
+	tri_processed = {}
+	print "Counting triangles..."
 	triangles = node_iterator_plus_plus(G);
+	print "Finished counting triangles"
 	#print len(triangles)
 	for v,u,w in triangles:
+		tri = int(v.split("_")[0]) + int(u.split("_")[0]) + int(w.split("_")[0])
+		if(tri in tri_processed):
+			#print "triangle already processed: " + str(tri)
+			continue
 		v_adj,u_adj,w_adj = G[v].keys(),G[u].keys(),G[w].keys()
 		#union_set = (v_adj.union(u_adj)).union(w_adj)
-		union_list = intersect(intersect(v_adj,u_adj),w_adj)
+		#union_list = intersect(intersect(v_adj,u_adj),w_adj)
+		#union_list = intersect(v_adj, u_adj, w_adj)
+		union_list = intersect(G, v_adj, u, w)
 		#print union_list
 		if(len(union_list) > 0):
 			for z in union_list:
@@ -79,6 +88,16 @@ def optimized_max_edgeweighted_4clique(G):
 					print "Found clique: " + "v: " + v + ", u: " + u + ", w: " + w + ", z: " + z
 					print "Weight of clique: " + str(weight)
 					current_clique = ((v,u,w,z),weight)
+				# update aux
+				tri_one = int(v.split("_")[0]) + int(u.split("_")[0]) + int(w.split("_")[0]) #v+u+w
+				tri_two = int(v.split("_")[0]) + int(u.split("_")[0]) + int(z.split("_")[0]) #v+u+z
+				tri_three = int(v.split("_")[0]) + int(w.split("_")[0]) + int(z.split("_")[0]) #v+w+z
+				tri_four = int(u.split("_")[0]) + int(w.split("_")[0]) + int(z.split("_")[0]) #u+w+z
+				
+				tri_processed[tri_one] = 1
+				tri_processed[tri_two] = 1
+				tri_processed[tri_three] = 1
+				tri_processed[tri_four] = 1
 	return current_clique
 
 
@@ -93,6 +112,8 @@ def node_iterator_plus_plus(G):
 					if(len(G[w]) >= len(G[u])):
 						if(w in G[u]):
 							triangles.append((v,u,w))
+							#unique_key = int(v)+int(u)+int(w)
+							#triangles[unique_key] = 0
 
 	return triangles
 
@@ -101,9 +122,17 @@ def get_clique_weight(adj,v,u,w,z):
 	return min(adj[v][u],adj[v][w],adj[v][z],adj[u][w],adj[u][z],adj[w][z])
 	#return adj[v][u] + adj[v][w] + adj[v][z] + adj[u][w] + adj[u][z] + adj[w][z]
 
-def intersect(a, b):
+'''def intersect(a, b):
     """ return the intersection of two lists """
-    return list(set(a) & set(b))
+    return list(set(a) & set(b))'''
+
+def intersect(adj, a, b_key, c_key):
+    """ return the intersection of two lists """
+    intersection = []
+    for i in a:
+    	if(i in adj[b_key] and i in adj[c_key]):
+    		intersection.append(i)
+    return intersection
 
 
 
@@ -126,11 +155,11 @@ print "Finished building graph"
 print "Running algorithm..."
 
 # NAIVE
-max_clique = naive_max_edgeweighted_4clique(graph)
+#max_clique = naive_max_edgeweighted_4clique(graph)
 #pprint(max_clique)
 
 # OPTIMIZED
-#optimized_max_edgeweighted_4clique(graph)
+optimized_max_edgeweighted_4clique(graph)
 
 
 
