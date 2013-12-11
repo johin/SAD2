@@ -1,0 +1,73 @@
+ We	have v > u	
+ If	δv > δu
+ Or	if δv = δu, and idv > idu	
+
+
+Map1 (edge(u,v); value $)
+	if v > u then
+		emit(u,$;v)
+	else
+		emit(u,v;$) - return edge to graph
+	
+
+Shuffle -> Aggregated list of vertexes
+
+
+
+Reduce1((u,v); aggregated vertexes Q = [u1,u2, .. ,u3])
+	if v not in $ -> emit(u,v;$) pair to graph and return
+
+	for all vertex x in Q do
+		for all vertex y in Q do
+			for all vertex z in Q do
+				if id[x] < id[y] emit pair (x,y;y) - possible triangle, 2-path with possible edge that closes the triangle 
+
+
+Map2(edges(u,v,w); value $)
+	if w > v and v > u
+		emit(u,v,$;w)
+	else
+		emit(u,v,w;$)
+
+
+Shuffle -> Aggregated list of vertexes
+
+
+Reduce2((u,v,w); aggregated vertexes Q = [w1,w2, .. ,w3])
+	if w not in $ -> return pair to graph and return
+
+	for all vertex y in Q do
+		for all vertex z in Q do
+			for all vertex a in Q do
+				if id[x] < id[y] < id[z] emit pair (y,z,u,a) - 4-clique found
+
+
+Shuffle - Aggregated list of vertexes
+
+
+Map3(edges(u,v,w,x); $)
+	if x > w > v > u
+		emit(u,v,w,$;x)
+	else
+		emit(u,v,w;$)
+
+
+Shuffle - Aggregated list of vertexes
+
+
+Reduce3((u,v,w,x); aggregated vertexes Q = [x1,x2, .. ,x3])
+	if x not in $ -> return pair to graph and return
+		emit((u,v,w,x);size(Q)-1)
+
+Shuffle - Aggregated list of vertexes
+
+Map4((u,v,w,x); count c)
+	emit the found 4-clique and the count
+
+Shuffle - Aggregated list of vertexes
+
+
+Reduce4((u,v,w,x); Q = [c1, c2, .. ,c3])
+	sum Q and divide by 4, emit result
+	
+

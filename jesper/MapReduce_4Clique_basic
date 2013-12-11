@@ -1,0 +1,83 @@
+
+Map1 (edge(u,v);value $)
+	for (u,$) that contains v emit pair (u,$;v)
+	for (v,$) that contains u emit pair (v,$;u)
+	if (u,v) not in $ return pair to graph emit((u,v);$)
+
+	
+
+Shuffle -> Aggregated list of vertexes
+
+
+
+Reduce1((u,v); aggregated vertexes Q = [u1,u2, .. ,u3])
+	if v not in $ -> return pair to graph and return
+
+	for all vertex x in Q do
+		for all vertex y in Q do
+			for all vertex z in Q do
+				if id[x] < id[y] emit pair (x,y;u) - possible triangle, 2-path with possible edge that closes the triangle 
+
+
+
+Map2((u,v);w)
+	if vertex w is adjacen to (u,v) emit pair (u,v;z)
+
+
+
+Shuffle -> Aggregated list of vertexes
+
+
+
+Reduce2((u,v); aggregated vertexes Q = [w1,w2, .. ,w3])
+	if $ is in Q 
+		emit found triangle (u,w[i],v)
+
+
+Shuffle - Aggregated list of vertexes
+
+
+Map3(edges(u,v,w);value $)
+	for (u,v,$) that contains x emit (u,$;x) 
+	for (v,w,$) that contains x emit (v,$;x)
+	for (w,u,$) that contains x emit (w,$;x)
+	if (u,v,w) not in $ return pair to graph
+
+
+Shuffle - Aggregated list of vertexes
+
+
+
+Reduce3((u,v,w); aggregated vertexes Q = [u1,u2, .. ,v1,v2, .. ,x1,x2])
+	if x not in $ -> return pair to graph and return
+
+	for all vertex y in Q do
+		for all vertex z in Q do
+			for all vertex a in Q do
+				if id[y] < id[z] emit pair (y,z,u,a) - possible 4-clique, triangle with possible common extra vertex 
+
+
+Shuffle - Aggregated list of vertexes
+
+
+Map4((u,v,w);x)
+	if vertex x is adjacen to (u,v,w) emit pair (u,v,w;x)
+
+
+Shuffle - Aggregated list of vertexes
+
+
+Reduce4((u,v,w); aggregated vertexes Q = [x1,x2, .. ,x3])
+	if x is in u_neighbours and v_neighbours and w_neighbours
+		emit found 4-clique ((u,v,w,x);size(Q) -1)
+
+Shuffle - Aggregated list of vertexes
+
+Map5((u,v,w,x); count c)
+	emit the found 4-clique and the count
+
+Shuffle - Aggregated list of vertexes
+
+
+Reduce5((u,v,w,x); Q = [c1, c2, .. ,c3])
+	sum Q and divide by 4, emit result
