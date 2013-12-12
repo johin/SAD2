@@ -1,0 +1,135 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,tabularx}
+\usepackage[a4paper]{geometry}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+
+\title{The search for strong 4-cliques in Hollywood.}
+\author{Jonas Hinge (jhin), Jesper Jensen (jejen),  Thomas Snaidero (tsna)}
+\date{December 2013}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
+
+\subsection{Hollywood as a social network}
+A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. Friends, collegues, Home city or common interests.
+The growth rate of a social network is very fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered as a social network of actors tied together by the movies they play together.
+
+
+\subsection{Finding strong 4-cliques}
+We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood all inclusive, this graph will form a social network of actors based on the following.
+Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie. To define how strong the tie between two actors, we use the number of movies that they have stared in together as weight on the edge between them.
+
+TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
+
+\subsection{Basic notations}
+We define a graph G with vertices V and edges E.
+
+TODO: Add what we need to define, maybe at the end of the project process
+
+
+\section{A sequential algorithm}
+
+\subsection{Naive first attempt}
+Our bruteforce algorithm.... (NOT CORRECT YET!)
+
+\begin{algorithm}
+\caption{$Naive Max Edgeweighted 4Clique(G)$}
+\begin{algorithmic}
+\STATE $Cl = dictionary$
+\FOR{$v, v_neighbours \in G$}
+\FOR{$u, u_wt \in v_neighbours$}
+\FOR{$w, w_wt \in v_neighbours$}
+\IF{$w \in G[u]$}
+\FOR{$z, z_wt \in v_neighbours$}
+\IF{$z \in G[w] \and z \in G[u] \and z != w \and z != u$}
+\IF{$Get Clique Weight(G,v,u,w,z) > Cl$}
+\STATE $Cl = ((v,u,w,z),Get Clique Weight(G,v,u,w,z))$
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDFOR
+\ENDFOR
+\RETURN $Cl$
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{A better approach extending triangle counting}
+
+\subsection{Adapting the triangle counting approach}
+
+\subsection{Implementation and results}
+
+\section{A parallel algorithm using MapReduce}
+
+\subsection{MapReduce basics}
+Network analysis of eg. interconnected networks like the Internet for web pages and meta data to build a search engine or of a social network like Facebook, twitter or Instagram provides a challenge for even high power servers. To solve this problem Google engineers founded and implemented MapReduce. MapReduce is a programming model inspired by functional programming founded in the 60's. It's designed for large-scale data processing and designed to run on clusters of commodity hardware hence it does not require high power servers or HPC clusters to run.
+In more details, MapReduce is a programming framework that provides the capability of cluster computations. MapReduce keeps track of synchronization and data across the clusters, this eases the burden of the programmers and makes it's easier than maltreated programming to implement.
+
+\noindent MapReduce accepts other functions as arguments for further decomposition of problem. The two main functions in MapReduce is the Map function and the Fold / Reduce function, in between the Map and the Recude a shuffeling actions is executed to allign the keys for each Reduce function so that one Reduce function handles one key.
+
+
+
+\subsubsection{Map function}
+The MapFunction build an associative array from the input and emits key, value paris.
+
+
+
+\subsubsection{Shuffle}
+After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
+
+
+\subsubsection{Fold (Reduce) Function}
+The Reduce function unions the input data by counting the occurence of a given key and emmitning a single $<key,value>$ pair containing the input key and the number of occrurences the input.
+
+
+
+
+TODO: Shorter more precise
+
+
+TOOD: Write
+
+
+\section{Discussion}
+
+\section{Conclusion}
+
+\begin{thebibliography}{1}
+
+\bibitem{socialnetworkwiki}
+    wikipedia:
+    \emph{Social network}
+    \url{http://en.wikipedia.org/wiki/Social_network}
+
+\bibitem{socialgraphwiki}
+    wikipedia:
+    \emph{Social graph}
+    \url{http://en.wikipedia.org/wiki/Social_graph}
+
+\bibitem{lnMapReduce}
+    Lecture notes: Slides MapReduce lecture
+    \emph{MapReduce}
+    \url{https://blog.itu.dk/SAD2-E2013/files/2013/11/mapreduce.pdf}
+    
+\end{thebibliography}
+
+\end{document}
+
+
+%Funny trivia:
+All movies from 2005 7 mins. 11 sec. runtime
