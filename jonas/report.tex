@@ -1,0 +1,140 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,tabularx}
+\usepackage[a4paper]{geometry}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+
+\title{The search for strong 4-cliques in Hollywood.}
+\author{Jonas Hinge (jhin), Jesper Jensen (jejen),  Thomas Snaidero (tsna)}
+\date{December 2013}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
+
+\subsection{Hollywood as a social network}
+The term social network dates back to the late 1800s, both Émile Durkheim and Ferdinand Tönnies foreshadowed the idea of social networks in their theories and research of social groups. Tönnies argued that social groups can exist as personal and direct social ties that either link individuals who share values and belief (Gemeinschaft, German, commonly translated as "community") or impersonal, formal, and instrumental social links (Gesellschaft, German, commonly translated as "society").
+
+\noindent Today, the term social network has become more common and more specific, multiple service providers delivers social networking both based on community and society eg. Linkedin, Google+, Facebook, Twitter, Instagram and many more. Speaking at the Facebook f8 event in May 2007, CEO Mark Zuckerberg used the term "social graph" to refer to the network of connections and relationships between site users. Zuckerberg said that \textit{ "it's the reason Facebook works". He went on to say the social graph is "changing the way the world works... As Facebook adds more and more people with more and more connections, it continues growing and becomes more useful at a faster rate"}. \cite{socialgraphwiki}
+
+\noindent A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. The members Home city, Employer or common interests. Social graphs tends to grow rapidly as each new node in the graph often has community of it's own, some inside the global social network and some outside the global network as the node is included in the network parts of the community outside the golbal network tends to join as well. Each one with their communities and so on. This quickly leads to very large amounts of data not suiteable for analysis om commodity hardware or powerfull server nodes.
+
+TODO: Shorter, more precise
+
+
+\subsection{Finding strong 4-cliques}
+\noindent We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood all inclusive, this graph will form a social network of actors based on the following.
+Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie. To define how strong the tie between two actors, we use the number of movies that they have stared in together as weight on the edge between them.
+
+TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
+
+\subsection{Basic notations}
+We define a graph G with vertices V and edges E.
+
+TODO: Add what we need to define, maybe at the end of the project process
+
+
+\section{A sequential algorithm}
+
+\subsection{Naive first attempt}
+Our bruteforce algorithm.... (NOT CORRECT YET!)
+
+\begin{algorithm}
+\caption{$Naive Max Edgeweighted 4Clique(G)$}
+\begin{algorithmic}
+\STATE $Cl = dictionary$
+\FOR{$v, v_neighbours \in G$}
+\FOR{$u, u_wt \in v_neighbours$}
+\FOR{$w, w_wt \in v_neighbours$}
+\IF{$w \in G[u]$}
+\FOR{$z, z_wt \in v_neighbours$}
+\IF{$z \in G[w] \and z \in G[u] \and z != w \and z != u$}
+\IF{$Get Clique Weight(G,v,u,w,z) > Cl$}
+\STATE $Cl = ((v,u,w,z),Get Clique Weight(G,v,u,w,z))$
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDFOR
+\ENDFOR
+\RETURN $Cl$
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{A better approach extending triangle counting}
+
+\subsection{Adapting the triangle counting approach}
+
+\subsection{Implementation and results}
+
+\section{A parallel algorithm using MapReduce}
+
+\subsection{MapReduce basics}
+Network analysis of eg. interconnected networks like the Internet for web pages and meta data to build a search engine or of a social network like Facebook, twitter or Instagram provides a challenge for even high power servers. To solve this problem Google engineers founded and implemented MapReduce. MapReduce is a programming model inspired by functional programming founded in the 60's. It's designed for large-scale data processing and designed to run on clusters of commodity hardware hence it does not require high power servers or HPC clusters to run.
+In more details, MapReduce is a programming framework that provides the capability of cluster computations. MapReduce keeps track of synchronization and data across the clusters, this eases the burden of the programmers and makes it's easier than maltreated programming to implement.
+
+\noindent MapReduce accepts other functions as arguments for further decomposition of problem. The two main functions in MapReduce is the Map function and the Fold / Reduce function, in between the Map and the Recude a shuffeling actions is executed to allign the keys for each Reduce function so that one Reduce function handles one key.
+
+
+
+\subsubsection{Map function}
+The MapFunction build an associative array from the input and emits key, value paris.
+
+
+
+\subsubsection{Shuffle}
+After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
+
+
+\subsubsection{Fold (Reduce) Function}
+The Reduce function unions the input data by counting the occurence of a given key and emmitning a single $<key,value>$ pair containing the input key and the number of occrurences the input.
+
+
+
+
+TODO: Shorter more precise
+
+
+TOOD: Write
+
+
+\section{Discussion}
+
+\section{Conclusion}
+
+\begin{thebibliography}{1}
+
+\bibitem{socialnetworkwiki}
+    wikipedia:
+    \emph{Social network}
+    \url{http://en.wikipedia.org/wiki/Social_network}
+
+\bibitem{socialgraphwiki}
+    wikipedia:
+    \emph{Social graph}
+    \url{http://en.wikipedia.org/wiki/Social_graph}
+
+\bibitem{lnMapReduce}
+    Lecture notes: Slides MapReduce lecture
+    \emph{MapReduce}
+    \url{https://blog.itu.dk/SAD2-E2013/files/2013/11/mapreduce.pdf}
+    
+\end{thebibliography}
+
+\end{document}
+
+
+%Funny trivia:
+All movies from 2005 7 mins. 11 sec. runtime
