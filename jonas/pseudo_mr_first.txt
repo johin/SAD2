@@ -1,0 +1,65 @@
+MAPREDUCE FIRST ATTEMPT - FINDING 4-CLIQUES
+
+Round 1:
+
+	MAP(<u,v>:$)
+	emit(<u,$>:v)
+	emit(<v,$>:u)
+	emit(<u,v>:$) // propagating
+
+	REDUCE(<u,v>:adj_u = [u1,u2,...])
+	if(v!=$)
+		emit(<u,v>:$) and return // propagating
+	for x in adj_u
+		for y in adj_v
+			if id_x < id_y
+				emit(<x,y>:u) // path x,u,y, we need to check if x,y is connected in order to close triangle
+
+
+Round 2:
+
+	MAP(<u,v>:w)
+	emit(<u,v>:w) // propagating
+
+	REDUCE(<u,v>:vert = [w1,w2,...])
+	if($ is in vert) // triangle is closed
+		emit(u,v,w)
+
+
+Round 3:
+
+	MAP(<u,v,w>:$)
+	if(v > u > w)
+		emit(<u,v,$>:w)
+	emit(<u,v,w>:$) // propagating
+
+	REDUCE(<u,v,w>:adj_uv = [uv1,uv2,...])
+	if(w!=$)
+		emit(<u,v,w>:$) and return // propagating
+	for x in adj_uv
+		for y in adj_uv
+			if(id_x < id_y)
+				emit(<x,y,u>:v)
+
+
+Round 4:
+
+	MAP(<u,v,w>:z)
+	emit(<u,v,w>:z) // propagating
+
+	REDUCE(<u,v,w>:vert = [z1,z2,...])
+	if($ is in vert)
+		emit(weight:<u,v,w,z>)
+
+
+Round 5:
+	
+	MAP(weight:<u,v,w,z>)
+	emit(weight:<u,v,w,z>) // propagating
+
+	REDUCE(weight:4cliques = [<u1,v1,w1,z1>,<u2,v2,w2,z2>,...)
+	if(weight is max)
+		emit(<u,v,w,z>:weight)
+
+
+

@@ -8,7 +8,7 @@ USE_CACHE = False
 
 SQL_GET_ALL_MOVIES = """
 	SELECT id FROM movies
-	WHERE year >= 2005
+	WHERE year >= 2006
 """
 
 SQL_GET_ROLES_OF_MOVIE = """
@@ -94,12 +94,15 @@ def node_iterator_plus_plus_extension_4cliques(G):
 	cliques_total = {}
 	for v, v_neighbours in G.iteritems():
 		for u, u_wt in v_neighbours.iteritems():
-			if(u.split("_")[0] > v.split("_")[0]):
+			#if(v.split("_")[0] > u.split("_")[0]):
+			if(higher_degree(G,v,u)):
 				for w, w_wt in v_neighbours.iteritems():
-					if(w.split("_")[0] > u.split("_")[0]):
+					#if(u.split("_")[0] > w.split("_")[0]):
+					if(higher_degree(G,u,w)):
 						if(w in G[u]):
 							for z, z_wt in v_neighbours.iteritems():
-								if(z.split("_")[0] > w.split("_")[0]):
+								#if(w.split("_")[0] > z.split("_")[0]):
+								if(higher_degree(G,w,z)):
 									if(z in G[w] and z in G[u]):
 										update_discovered(cliques_total,v,u,w,z,get_clique_weight(G,v,u,w,z))
 										if(get_clique_weight(G,v,u,w,z) > current_clique[1]):
@@ -146,9 +149,11 @@ def node_iterator_plus_plus_w_ids(G):
 	cliques_total = {}
 	for v, v_neighbours in G.iteritems():
 		for u, u_wt in v_neighbours.iteritems():
-			if(u.split("_")[0] > v.split("_")[0]):
+			#if(u.split("_")[0] > v.split("_")[0]):
+			if(higher_degree(G,v,u)):
 				for w, w_wt in v_neighbours.iteritems():
-					if(w.split("_")[0] > u.split("_")[0]):
+					#if(w.split("_")[0] > u.split("_")[0]):
+					if(higher_degree(G,u,w)):
 						if(w in G[u]):
 							triangles.append((v,u,w))
 							update_discovered(cliques_total,v,u,w,"0_0",-1)
@@ -176,6 +181,16 @@ def intersect(adj, a, b_key, c_key):
     	if(i in adj[b_key] and i in adj[c_key]):
     		intersection.append(i)
     return intersection
+
+# higher degree heuristic
+def higher_degree(G,u,v):
+	if(len(G[u]) > len(G[v])):
+		return True
+	elif(len(G[u]) == len(G[v])):
+		if(u.split("_")[0] > v.split("_")[0]):
+			return True
+	else:
+		return False
 
 def update_discovered(D,v,u,w,z,weight):
 	id_aux = [int(v.split("_")[0]), int(u.split("_")[0]), int(w.split("_")[0]), int(z.split("_")[0])]
