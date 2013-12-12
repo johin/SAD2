@@ -39,28 +39,36 @@ Each node in the graph is an actor, an Edge is formed if two actors have stared 
 TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
 
 \subsection{Basic notations}
-We define a graph G with vertices V and edges E.
+We define an undirected graph G with vertices V and edges E.
+Edges have weights
 
 TODO: Add what we need to define, maybe at the end of the project process
+
+T = triangles
+W = weight function, list pseudo code
+v,u,w,z = vertices in the graph
+e.g. (v,u) is an edge
+e.g. $v_{adj}$
 
 
 \section{A sequential algorithm}
 
 \subsection{Naive first attempt}
-Our bruteforce algorithm.... (NOT CORRECT YET!)
+TODO: Description...
 
 \begin{algorithm}
-\caption{$Naive Max Edgeweighted 4Clique(G)$}
+\caption{$4clique\_iterator$}
 \begin{algorithmic}
-\STATE $Cl = dictionary$
-\FOR{$v, v_neighbours \in G$}
-\FOR{$u, u_wt \in v_neighbours$}
-\FOR{$w, w_wt \in v_neighbours$}
-\IF{$w \in G[u]$}
-\FOR{$z, z_wt \in v_neighbours$}
-\IF{$z \in G[w] \and z \in G[u] \and z != w \and z != u$}
-\IF{$Get Clique Weight(G,v,u,w,z) > Cl$}
-\STATE $Cl = ((v,u,w,z),Get Clique Weight(G,v,u,w,z))$
+\REQUIRE $V,E$
+\STATE $best\_clique = <empty>$
+\FOR{$v \in V$}
+\FOR{$u \in v_{adj}$}
+\FOR{$w \in v_{adj}$}
+\IF{$(u,w) \in E$}
+\FOR{$z \in v_{adj}$}
+\IF{$(w,z) \in E$ \AND $(u,z) \in E$}
+\IF{$W(V,E,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = <v,u,w,z>$
 \ENDIF
 \ENDIF
 \ENDFOR
@@ -68,16 +76,40 @@ Our bruteforce algorithm.... (NOT CORRECT YET!)
 \ENDFOR
 \ENDFOR
 \ENDFOR
-\RETURN $Cl$
-
+\RETURN $best\_clique$
 \end{algorithmic}
 \end{algorithm}
 
+\subsubsection{Analysis}
+TODO: Analysis
+
 \subsection{A better approach extending triangle counting}
+TODO: Explain briefly triangle counting
+TODO: Triangles can be found from NodeIterator++
+
+\begin{algorithm}
+\caption{$4clique\_iterator+$}
+\begin{algorithmic}
+\REQUIRE $V,E,T$
+\STATE $best\_clique = <empty>$
+\FOR{$<v,u,w> \in T$}
+\STATE $intersection\_list = intersect(v_{adj}, u_{adj}, w_{adj})$
+\IF{$intersection\_list > 0$}
+\FOR{$z \in intersection\_list$}
+\IF{$W(V,E,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = <v,u,w,z>$
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\RETURN $best\_clique$
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Adapting the triangle counting approach}
 
 \subsection{Implementation and results}
+Graph is build as an adjacency list, show example of some vertices and their <edge;weight> hashset...
 
 \section{A parallel algorithm using MapReduce}
 
