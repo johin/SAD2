@@ -8,7 +8,7 @@ USE_CACHE = False
 
 SQL_GET_ALL_MOVIES = """
 	SELECT id FROM movies
-	WHERE year >= 2006
+	WHERE year >= 2005
 """
 
 SQL_GET_ROLES_OF_MOVIE = """
@@ -92,23 +92,26 @@ def optimized_max_edgeweighted_4clique(G):
 def node_iterator_plus_plus_extension_4cliques(G):
 	current_clique = ((),-1)
 	cliques_total = {}
+	run_count = 0
 	for v, v_neighbours in G.iteritems():
 		for u, u_wt in v_neighbours.iteritems():
 			#if(v.split("_")[0] > u.split("_")[0]):
-			if(higher_degree(G,v,u)):
+			if(higher_degree(G,u,v)):
 				for w, w_wt in v_neighbours.iteritems():
 					#if(u.split("_")[0] > w.split("_")[0]):
-					if(higher_degree(G,u,w)):
+					if(higher_degree(G,w,u)):
 						if(w in G[u]):
 							for z, z_wt in v_neighbours.iteritems():
 								#if(w.split("_")[0] > z.split("_")[0]):
-								if(higher_degree(G,w,z)):
+								if(higher_degree(G,z,w)):
+									run_count += 1
 									if(z in G[w] and z in G[u]):
 										update_discovered(cliques_total,v,u,w,z,get_clique_weight(G,v,u,w,z))
 										if(get_clique_weight(G,v,u,w,z) > current_clique[1]):
 											current_clique = ((v,u,w,z),get_clique_weight(G,v,u,w,z))
 											print "Found a clique higher: " + "v: " + v + ", u: " + u + ", w: " + w + ", z: " + z
 											print "Weight of clique: " + str(get_clique_weight(G,v,u,w,z))
+	print "Run count: " + str(run_count)
 	return cliques_total
 
 
@@ -150,10 +153,10 @@ def node_iterator_plus_plus_w_ids(G):
 	for v, v_neighbours in G.iteritems():
 		for u, u_wt in v_neighbours.iteritems():
 			#if(u.split("_")[0] > v.split("_")[0]):
-			if(higher_degree(G,v,u)):
+			if(higher_degree(G,u,v)):
 				for w, w_wt in v_neighbours.iteritems():
 					#if(w.split("_")[0] > u.split("_")[0]):
-					if(higher_degree(G,u,w)):
+					if(higher_degree(G,w,u)):
 						if(w in G[u]):
 							triangles.append((v,u,w))
 							update_discovered(cliques_total,v,u,w,"0_0",-1)
@@ -186,9 +189,8 @@ def intersect(adj, a, b_key, c_key):
 def higher_degree(G,u,v):
 	if(len(G[u]) > len(G[v])):
 		return True
-	elif(len(G[u]) == len(G[v])):
-		if(u.split("_")[0] > v.split("_")[0]):
-			return True
+	elif(len(G[u]) == len(G[v]) and u.split("_")[0] > v.split("_")[0]):
+		return True
 	else:
 		return False
 
