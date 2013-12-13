@@ -33,14 +33,17 @@ TODO: Shorter, more precise
 
 
 \subsection{Finding strong 4-cliques}
+A 4clique consist of 4 actors where each actor-pair has played in the same movie. e.g. TODO: figure with real names...
 \noindent We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood all inclusive, this graph will form a social network of actors based on the following.
 Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie. To define how strong the tie between two actors, we use the number of movies that they have stared in together as weight on the edge between them.
 
 TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
 
 \subsection{Basic notations}
-We define an undirected graph G with vertices V and edges E.
-Edges have weights
+We define the hollywood social network as an undirected graph G with vertices V and edges E.
+Edges have weights TODO: write...
+
+Number of vertices is written as n and edges as m
 
 TODO: Add what we need to define, maybe at the end of the project process
 
@@ -54,13 +57,13 @@ A strong clique = we define a weight function of a clique to give a strongness v
 
 
 \section{A sequential algorithm}
-In the search for finding an optimal algorithm
+Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this case we just return one of the strongest 4-cliques.
 
 \subsection{Naive first attempt}
-TODO: Description...
+An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph V,E as input.
 
 \begin{algorithm}
-\caption{$4clique\_iterator$}
+\caption{$strong\_4clique\_finder$}
 \begin{algorithmic}
 \REQUIRE $V,E$
 \STATE $best\_clique = <empty>$
@@ -84,14 +87,16 @@ TODO: Description...
 \end{algorithm}
 
 \subsubsection{Analysis}
-TODO: Analysis
+In the worst case a vertex v will have $n-1$ adjacent vertices, so for every v we have $O(n^{3})$ resulting in a total running time of $O(n^{4})$. This is not an attractive result as this easily could end up never executing especially with massive graphs with large n and m.
 
 \subsection{A better approach extending triangle counting}
-TODO: Explain briefly triangle counting
-TODO: Triangles can be found from NodeIterator++
+Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast algorithm for finding triangles in a graph. A triangle is close to a 4-clique we only need 1 node that in turn should be connected to all 3 nodes in the triangle.
+
+\subsubsection{Idea}
+We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles. These are found by NodeIterator++ \cite{countingTriangles}.
 
 \begin{algorithm}
-\caption{$4clique\_iterator+$}
+\caption{$strong\_4clique\_finder+$}
 \begin{algorithmic}
 \REQUIRE $V,E,T$
 \STATE $best\_clique = <empty>$
@@ -110,13 +115,13 @@ TODO: Triangles can be found from NodeIterator++
 \end{algorithm}
 
 \subsubsection{Analysis}
-Triangle counting runs in $O(m^{3/2})$ and for each triangle we make an intersection $O(n)$ and runs through this intersected list $O(n)$ so $O(n*m^{3/2})$
+We know from \cite{countingTriangles} that counting the triangles runs in $O(m^{3/2})$. For each triangle we make an intersection $O(n)$ and run through this intersected list $O(n)$ resulting in $O(2n)$ or just $O(n)$. So the total running time for finding strong 4-cliques is $O(nm^{3/2})$.
 
 \subsection{Adapting the triangle counting approach}
 TODO: Adapting same technique as in triangle counting, lowest id responsible for counting the clique
 
 \begin{algorithm}
-\caption{$4clique\_iterator$}
+\caption{$strong\_4clique\_finder++$}
 \begin{algorithmic}
 \REQUIRE $V,E$
 \STATE $best\_clique = <empty>$
@@ -188,7 +193,7 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 \subsubsection{Analysis}
 TODO: Number of rounds, time complexity etc...
 
-Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles
+Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles or $n-2$ or $O(m)$
 
 
 \section{Discussion}
