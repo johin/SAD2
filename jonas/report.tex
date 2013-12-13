@@ -49,6 +49,8 @@ W = weight function, list pseudo code
 v,u,w,z = vertices in the graph
 e.g. (v,u) is an edge
 e.g. $v_{adj}$
+D = degree function
+A strong clique = we define a weight function of a clique to give a strongness value
 
 
 \section{A sequential algorithm}
@@ -106,7 +108,39 @@ TODO: Triangles can be found from NodeIterator++
 \end{algorithmic}
 \end{algorithm}
 
+\subsubsection{Analysis}
+
 \subsection{Adapting the triangle counting approach}
+TODO: Adapting same technique as in triangle counting, lowest id responsible for counting the clique
+
+\begin{algorithm}
+\caption{$4clique\_iterator$}
+\begin{algorithmic}
+\REQUIRE $V,E$
+\STATE $best\_clique = <empty>$
+\FOR{$v \in V$}
+\FOR{$u \in v_{adj}$}
+\IF{$D(v) > D(u)$}
+\FOR{$w \in v_{adj}$}
+\IF{$(u,w) \in E$ \AND $D(u) > D(w)$}
+\FOR{$z \in v_{adj}$}
+\IF{$(w,z) \in E$ \AND $(u,z) \in E$ \AND $D(w) > D(z)$}
+\IF{$W(V,E,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = <v,u,w,z>$
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDFOR
+\RETURN $best\_clique$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Analysis}
+
 
 \subsection{Implementation and results}
 Graph is build as an adjacency list, show example of some vertices and their <edge;weight> hashset...
@@ -145,6 +179,8 @@ TOOD: Write
 \section{Discussion}
 
 \section{Conclusion}
+TODO: We can conclude....
+Optimal running time for finding a strong 4cliques is...
 
 \begin{thebibliography}{1}
 
