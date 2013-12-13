@@ -8,7 +8,7 @@ USE_CACHE = False
 
 SQL_GET_ALL_MOVIES = """
 	SELECT id FROM movies
-	WHERE year >= 2005
+	WHERE rank > 9.2
 """
 
 SQL_GET_ROLES_OF_MOVIE = """
@@ -95,14 +95,14 @@ def node_iterator_plus_plus_extension_4cliques(G):
 	run_count = 0
 	for v, v_neighbours in G.iteritems():
 		for u, u_wt in v_neighbours.iteritems():
-			#if(v.split("_")[0] > u.split("_")[0]):
+			#if(u.split("_")[0] > v.split("_")[0]):
 			if(higher_degree(G,u,v)):
 				for w, w_wt in v_neighbours.iteritems():
-					#if(u.split("_")[0] > w.split("_")[0]):
+					#if(w.split("_")[0] > u.split("_")[0]):
 					if(higher_degree(G,w,u)):
 						if(w in G[u]):
 							for z, z_wt in v_neighbours.iteritems():
-								#if(w.split("_")[0] > z.split("_")[0]):
+								#if(z.split("_")[0] > w.split("_")[0]):
 								if(higher_degree(G,z,w)):
 									run_count += 1
 									if(z in G[w] and z in G[u]):

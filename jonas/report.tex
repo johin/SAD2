@@ -54,6 +54,7 @@ A strong clique = we define a weight function of a clique to give a strongness v
 
 
 \section{A sequential algorithm}
+In the search for finding an optimal algorithm
 
 \subsection{Naive first attempt}
 TODO: Description...
@@ -109,6 +110,7 @@ TODO: Triangles can be found from NodeIterator++
 \end{algorithm}
 
 \subsubsection{Analysis}
+Triangle counting runs in $O(m^{3/2})$ and for each triangle we make an intersection $O(n)$ and runs through this intersected list $O(n)$ so $O(n*m^{3/2})$
 
 \subsection{Adapting the triangle counting approach}
 TODO: Adapting same technique as in triangle counting, lowest id responsible for counting the clique
@@ -120,11 +122,11 @@ TODO: Adapting same technique as in triangle counting, lowest id responsible for
 \STATE $best\_clique = <empty>$
 \FOR{$v \in V$}
 \FOR{$u \in v_{adj}$}
-\IF{$D(v) > D(u)$}
+\IF{$D(u) > D(v)$}
 \FOR{$w \in v_{adj}$}
-\IF{$(u,w) \in E$ \AND $D(u) > D(w)$}
+\IF{$(u,w) \in E$ \AND $D(w) > D(u)$}
 \FOR{$z \in v_{adj}$}
-\IF{$(w,z) \in E$ \AND $(u,z) \in E$ \AND $D(w) > D(z)$}
+\IF{$(w,z) \in E$ \AND $(u,z) \in E$ \AND $D(z) > D(w)$}
 \IF{$W(V,E,v,u,w,z) > W(best\_clique)$}
 \STATE $best\_clique = <v,u,w,z>$
 \ENDIF
@@ -140,10 +142,13 @@ TODO: Adapting same technique as in triangle counting, lowest id responsible for
 \end{algorithm}
 
 \subsubsection{Analysis}
+Max number of pair numbers $sqrt{m}$ research, find ref
+
 
 
 \subsection{Implementation and results}
-Graph is build as an adjacency list, show example of some vertices and their <edge;weight> hashset...
+TODO: Graph is build as an adjacency list, show example of some vertices and their $<edge;weight>$ hashset...
+key = $actorid\_firstname\_lastname$
 
 \section{A parallel algorithm using MapReduce}
 
@@ -153,27 +158,37 @@ In more details, MapReduce is a programming framework that provides the capabili
 
 \noindent MapReduce accepts other functions as arguments for further decomposition of problem. The two main functions in MapReduce is the Map function and the Fold / Reduce function, in between the Map and the Recude a shuffeling actions is executed to allign the keys for each Reduce function so that one Reduce function handles one key.
 
-
-
 \subsubsection{Map function}
 The MapFunction build an associative array from the input and emits key, value paris.
-
-
 
 \subsubsection{Shuffle}
 After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
 
-
 \subsubsection{Fold (Reduce) Function}
 The Reduce function unions the input data by counting the occurence of a given key and emmitning a single $<key,value>$ pair containing the input key and the number of occrurences the input.
 
-
-
-
 TODO: Shorter more precise
 
+\subsection{Finding strong 4cliques using MapReduce}
+We come with a suggestion for finding strong 4cliques with MapReduce. It is based on the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce}. We basically extend the algorithm so instead of counting the triangles, we pass them on to another round.
 
-TOOD: Write
+\subsubsection{Idea}
+- we want to find 2 triangles that share 2 of the same nodes, then we can check if the remaining 2 nodes of the triangles are connected
+- there are 4 triangles in clique - 4 choose 2 = 6 edges
+- We only want to check 1 node pair for each clique
+- we make the lowest degree node of each triangle responsible for finding a node that completes the clique (i.e. find a triangle that shares 2 of the same nodes)
+- The clique will then only get counted 1 time
+
+\subsubsection{Proof}
+- We know we have counted each triangle 1 time
+- By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
+
+
+
+\subsubsection{Analysis}
+TODO: Number of rounds, time complexity etc...
+
+Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles
 
 
 \section{Discussion}
@@ -195,9 +210,14 @@ Optimal running time for finding a strong 4cliques is...
     \url{http://en.wikipedia.org/wiki/Social_graph}
 
 \bibitem{lnMapReduce}
-    Lecture notes: Slides MapReduce lecture
+    Lecture notes: MapReduce
     \emph{MapReduce}
     \url{https://blog.itu.dk/SAD2-E2013/files/2013/11/mapreduce.pdf}
+
+\bibitem{countingTriangles}
+    Siddharth Suri and Sergei Vassilvitskii
+    \emph{Counting Triangles and the Curse of the Last Reducer}
+    \url{http://theory.stanford.edu/~sergei/papers/www11-triangles.pdf}
     
 \end{thebibliography}
 
