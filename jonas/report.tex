@@ -218,8 +218,8 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 		\STATE $emit(\langle v,u \rangle:\$)$
 		\FOR{$x \in v_{adj}$}
 			\FOR{$y \in v_{adj}$}
-				\IF{$id_{x} < id_{y}$}
-				\STATE $emit(\langle x,y\rangle :v)$
+				\IF{$lower\_degree(x,y)$}
+					\STATE $emit(\langle x,y\rangle :v)$
 				\ENDIF
 			\ENDFOR
 		\ENDFOR
@@ -227,47 +227,28 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 
 \REQUIRE MAP 2: $\langle v,u\rangle :w$
 	\STATE $emit(\langle v,u\rangle :w)$
-\REQUIRE REDUCE 2: $\langle v,u\rangle : vertices = [w_1,w_2,...]$
-	\IF{$\$ \in vertices$}
-		\STATE remove \$ from vertices
-		\IF{$length(vertices) > 0$}
-			\STATE $emit(\langle v,u,w\rangle :\$)$
-		\ENDIF
+\REQUIRE REDUCE 2: $\langle v,u\rangle : vu_{adj} = [vu_1,vu_2,...]$
+	\IF{$\$ \in vu_{adj}$}
+		\STATE $emit(\langle v,u\rangle : \$)$
+		\STATE remove \$ from $vu_{adj}$
 	\ENDIF
-
-\REQUIRE MAP 3: $\langle v,u,w\rangle :\$$
-	\IF{$lower\_degree(lower\_degree(v, u), w)$}
-		\STATE $emit(\langle v,w \rangle :v)$
-		\STATE $emit(\langle v,u \rangle :\$)$
-	\ENDIF
-\REQUIRE REDUCE 3: $\langle v,u\rangle :vertices = [vu_1,vu_2,...]$
-	\ENSURE vertices does not contain redundant \$
-	\FOR{$i \in vertices$}
-		\IF{$i == \$$}
-			\STATE $emit(\langle v,u\rangle :\$)$
-			\STATE remove \$ from vertices
-		\ENDIF
-	\ENDFOR
-	\FOR{$x \in vertices$}
-		\FOR{$y \in vertices$}
-			\IF{$id_x < id_y$}
-				\STATE $emit(\langle x,y\rangle :\langle v,u,x,y\rangle)$
+	\FOR{$x \in vu_{adj}$}
+		\FOR{$y \in vu_{adj}$}
+			\IF{$lower\_degree(x,y)$}
+				\STATE $emit(\langle x,y\rangle :\langle v,u\rangle)$
 			\ENDIF
 		\ENDFOR
 	\ENDFOR
 
-\REQUIRE MAP 4: $\langle v,u\rangle :t$
-	\STATE $emit(\langle v,u\rangle :t)$
-\REQUIRE REDUCE 4 $\langle v,u\rangle :t$
-	\STATE $best\_clique = \langle empty\rangle$
-	\IF{$\$ \in t$}
-		\STATE remove \$ from vertices
-		\IF{$length(t) > 0$}
-			\IF{$W(t[0]) > W(best\_clique)$}
-				\STATE $best\_clique = t[0]$
+\REQUIRE MAP 3: $\langle v,u\rangle :wz$
+	\STATE $emit(\langle v,u\rangle :wz)$
+\REQUIRE REDUCE 3: $\langle v,u\rangle :wz = [wz_1,wz_2,...]$
+	\IF{$\$ \in wz$}
+		\FOR{$\langle w,z\rangle \in wz$}
+			\IF{$W(\langle v,u,w,z\rangle) > W(best\_clique)$}
+				\STATE $best\_clique = \langle v,u,w,z\rangle$
 			\ENDIF
-			\STATE $emit(\langle v,u,w\rangle :\$)$
-		\ENDIF
+		\ENDFOR
 	\ENDIF
 \end{algorithmic}
 \end{algorithm}
