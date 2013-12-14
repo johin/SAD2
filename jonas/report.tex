@@ -160,14 +160,16 @@ We implement this degree function to the naive first algorithm so before iterati
 \end{algorithm}
 
 \subsubsection{Analysis}
-It can be proved that when using the lowest degree responsibility trick a vertex will have a degree of $O(\sqrt[]{m})$ \cite{AlgorithmicAspects}. As we are using this trick but in 4 nested iterations through the adjacent nodes of a vertex v we will end up with a running time of $O(\sqrt[]{m}\sqrt[]{m}\sqrt[]{m}\sqrt[]{m})$ or just $O(m^{2})$. We also note that this way ensures that each 4-clique is counted only 1 time.
+It can be proved that when using the lowest degree responsibility trick a vertex will have a degree of $O(\sqrt[]{m})$ \cite{AlgorithmicAspects}. As we are using this trick but in 4 nested iterations through the adjacent nodes of a vertex v we will end up with a running time of $O(\sqrt[]{m}\sqrt[]{m}\sqrt[]{m}\sqrt[]{m})$ or just $O(m^{2})$. We also note that this way ensures that each 4-clique is counted only 1 time as we in each iteration make 1 node responsible for completing the 4-clique.
 
 
 \subsection{Implementation and results}
-TODO: JONAS
-TODO: Graph is build as an adjacency list, show example of some vertices and their $<edge;weight>$ hashset...
-key = $actorid\_firstname\_lastname$
-Datastructure calculating degree - only possible this way with a data set that can fit into memory
+We have implemented and compaired the sequential algorithms. The programming language used is Python 2.7 and the code is available at github TODO: REFERENCE.
+
+\subsubsection{Dataset and datastructure}
+For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
+
+TODO: figure example!
 
 
 
@@ -285,6 +287,8 @@ Optimal running time for finding a strong 4cliques is...
 Maybe we could improve the space complexity by using something else than adjacency list?
 Add a heuristic: < 4 degree nodes are not necessary to examine (I AM NOT SURE.....)
 Could the weights be included in the determination faces of the algorithms?
+degree weights when building the graph vs. calculating it while computing
+Datastructure calculating degree - only possible this way with a data set that can fit into memory
 
 \begin{thebibliography}{1}
 
