@@ -42,22 +42,12 @@ Each node in the graph is an actor, an Edge is formed if two actors have stared 
 TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
 
 \subsection{Basic notations}
-TODO: JONAS
-We define the hollywood social network as an undirected graph G with vertices V and edges E.
-Edges have weights TODO: write...
+We define the hollywood social network as an undirected simple graph G with vertices or nodes V and edges E. The number of vertices $|V| = n$ and $|E| = m$. The edges have weights corresponding to the number of times 2 actors (the 2 vertices) have played together. An edge is defined as $\langle v,u\rangle$, a triangle as $\langle v,u,w\rangle$ and a 4-clique as $\langle v,u,w,z\rangle$. The vertices in these so called cliques are all interconnected i.e. each pair is connected.
 
-Number of vertices is written as n and edges as m
+We define a weight function $W(\langle v,u,w,z\rangle )$ for calculating how strong a 4-clique is. It simply returns the median of the edge weights (6 edge weights in a 4-clique).
 
-TODO: Add what we need to define, maybe at the end of the project process
+We sometime write $v_{adj}$ and this means the adjacent vertices of $v$.
 
-T = triangles
-W = weight function, list pseudo code
-v,u,w,z = vertices in the graph
-e.g. <v,u> is an edge, <v,u,w> is a triangle etc explain correctly...
-e.g. $v_{adj}$ is the neighbouring vertices of v from the graph G
-D = degree function
-A strong clique = we define a weight function of a clique to give a strongness value
-\$ value in mapreduce
 
 
 \section{A sequential algorithm}
@@ -72,19 +62,19 @@ An intuitive first approach is the brute-force way. This algorithm simply checks
 \REQUIRE $G$
 \STATE $best\_clique = \langle empty\rangle $
 \FOR{$v \in V$}
-\FOR{$u \in v_{adj}$}
-\FOR{$w \in v_{adj}$}
-\IF{$w \in u_{adj}$}
-\FOR{$z \in v_{adj}$}
-\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$}
-\IF{$W(G,v,u,w,z) > W(best\_clique)$}
-\STATE $best\_clique = \langle v,u,w,z\rangle $
-\ENDIF
-\ENDIF
-\ENDFOR
-\ENDIF
-\ENDFOR
-\ENDFOR
+	\FOR{$u \in v_{adj}$}
+		\FOR{$w \in v_{adj}$}
+			\IF{$w \in u_{adj}$}
+				\FOR{$z \in v_{adj}$}
+					\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$}
+						\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+							\STATE $best\_clique = \langle v,u,w,z\rangle $
+						\ENDIF
+					\ENDIF
+				\ENDFOR
+			\ENDIF
+		\ENDFOR
+	\ENDFOR
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
@@ -97,7 +87,7 @@ In the worst case a vertex v will have $n-1$ adjacent vertices, so for every v w
 Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast algorithm for finding triangles in a graph. A triangle is close to a 4-clique we only need 1 node that in turn should be connected to all 3 nodes in the triangle.
 
 \subsubsection{Intersection idea}
-We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles. These are found by NodeIterator++ \cite{countingTriangles}.
+We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles $T$. These are found by NodeIterator++ \cite{countingTriangles}.
 
 \begin{algorithm}
 \caption{$strong\_4clique\_finder+$}
@@ -105,14 +95,14 @@ We see that if each node in a triangle has a common neighbour node this must clo
 \REQUIRE $G,T$
 \STATE $best\_clique = \langle empty\rangle $
 \FOR{$<v,u,w> \in T$}
-\STATE $intersection\_list = intersect(v_{adj}, u_{adj}, w_{adj})$
-\IF{$intersection\_list > 0$}
-\FOR{$z \in intersection\_list$}
-\IF{$W(G,v,u,w,z) > W(best\_clique)$}
-\STATE $best\_clique = \langle v,u,w,z\rangle $
-\ENDIF
-\ENDFOR
-\ENDIF
+	\STATE $intersection\_list = intersect(v_{adj}, u_{adj}, w_{adj})$
+	\IF{$intersection\_list > 0$}
+		\FOR{$z \in intersection\_list$}
+			\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+				\STATE $best\_clique = \langle v,u,w,z\rangle $
+			\ENDIF
+		\ENDFOR
+	\ENDIF
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
@@ -132,11 +122,11 @@ Schank \cite{AlgorithmicAspects} proposed that the lowest degree node in each tr
 \begin{algorithmic}
 \REQUIRE $v,u$
 \IF{$length(v_{adj)} < length(u_{adj})$}
-\RETURN $True$
+	\RETURN $True$
 \ELSIF{$length(v_{adj)} == length(u_{adj})$ \AND $id_{v} < id_{u}$}
-\RETURN $True$
+	\RETURN $True$
 \ELSE
-\RETURN $False$
+	\RETURN $False$
 \ENDIF
 \end{algorithmic}
 \end{algorithm}
@@ -149,21 +139,21 @@ We implement this degree function to the naive first algorithm so before iterati
 \REQUIRE $G$
 \STATE $best\_clique = \langle empty\rangle $
 \FOR{$v \in V$}
-\FOR{$u \in v_{adj}$}
-\IF{$lower\_degree(G,v,u)$}
-\FOR{$w \in v_{adj}$}
-\IF{$w \in u_{adj}$ \AND $lower\_degree(G,u,w)$}
-\FOR{$z \in v_{adj}$}
-\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$ \AND $lower\_degree(G,w,z)$}
-\IF{$W(G,v,u,w,z) > W(best\_clique)$}
-\STATE $best\_clique = \langle v,u,w,z\rangle $
-\ENDIF
-\ENDIF
-\ENDFOR
-\ENDIF
-\ENDFOR
-\ENDIF
-\ENDFOR
+	\FOR{$u \in v_{adj}$}
+		\IF{$lower\_degree(G,v,u)$}
+			\FOR{$w \in v_{adj}$}
+				\IF{$w \in u_{adj}$ \AND $lower\_degree(G,u,w)$}
+					\FOR{$z \in v_{adj}$}
+						\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$ \AND $lower\_degree(G,w,z)$}
+							\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+								\STATE $best\_clique = \langle v,u,w,z\rangle $
+							\ENDIF
+						\ENDIF
+					\ENDFOR
+				\ENDIF
+			\ENDFOR
+		\ENDIF
+	\ENDFOR
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
@@ -178,6 +168,8 @@ TODO: JONAS
 TODO: Graph is build as an adjacency list, show example of some vertices and their $<edge;weight>$ hashset...
 key = $actorid\_firstname\_lastname$
 Datastructure calculating degree - only possible this way with a data set that can fit into memory
+
+
 
 \section{A parallel algorithm using MapReduce}
 
@@ -212,9 +204,10 @@ In the first round we map edges from the graph, but using the lowest degree func
 We simply propogate the pairs in the mapping phase of round 2. In the reducer we check that the pairs emitted from round 1 is actually connected. This is done by removing and propogating the $\$$ from the pair $\langle v,u\rangle$ and if there are still values left, these are the vertices that connects to both vertices in the pair i.e. they close a triangle. We then iterate as in round 1 through these adjacent nodes and emit possible pairs, only this time with the key pair as value e.g. $\langle x,y \rangle :\langle v,u \rangle$.
 
 \paragraph{Round 3}
-
+As for the last round we simply propogate pairs in the mapper of round 3. In the reducing part we need to check, like in the triangle case last round, if the possible pairs we emitted are actually connected. If they are they will close a 4-clique. We do this by checking if there exist a $\$$ in the value list of the possible pairs and if so, we remove it and iterate through the list. This time the values will be pairs $\langle w,z \rangle$ and they are the ones closing a 4-clique $\langle v,u,w,z \rangle$. While iterating we keep track of the 4-clique with max weight. The pseudo code of the algorithm $mr\_strong\_4clique\_finder$ is shown on page \pageref{mrAlgorithm}.
 
 \begin{algorithm}
+\label{mrAlgorithm}
 \caption{$mr\_strong\_4clique\_finder$}
 \begin{algorithmic}
 \REQUIRE $G$
@@ -254,7 +247,9 @@ We simply propogate the pairs in the mapping phase of round 2. In the reducer we
 \REQUIRE MAP 3: $\langle v,u\rangle :wz$
 	\STATE $emit(\langle v,u\rangle :wz)$
 \REQUIRE REDUCE 3: $\langle v,u\rangle :wz = [wz_1,wz_2,...]$
+	\STATE $best\_clique = \langle empty\rangle $
 	\IF{$\$ \in wz$}
+	\STATE remove \$ from $wz$
 		\FOR{$\langle w,z\rangle \in wz$}
 			\IF{$W(\langle v,u,w,z\rangle) > W(best\_clique)$}
 				\STATE $best\_clique = \langle v,u,w,z\rangle$
@@ -265,6 +260,9 @@ We simply propogate the pairs in the mapping phase of round 2. In the reducer we
 \end{algorithm}
 
 \subsubsection{Analysis}
+
+
+
 TODO: Number of rounds, time complexity etc...
 
 Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles or $n-2$ or $O(m)$
@@ -278,6 +276,7 @@ Shuffling: remove redundant? e.g. $\langle a,b\rangle$ : \$ will be sent from bo
 
 lowest id
 for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
+
 
 
 \section{Conclusion}
