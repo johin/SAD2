@@ -200,8 +200,19 @@ The Reduce function unions the input data by counting the occurence of a given k
 TODO: Shorter more precise
 
 \subsection{Finding strong 4cliques using MapReduce}
-TODO: JONAS
-We come with a suggestion for finding strong 4cliques with MapReduce. It is based on the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles, we pass them on to another round.
+We come with a suggestion for finding strong 4-cliques with MapReduce. It is strongly inspired from the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles we search for strong 4-cliques but using the same techinques as for triangle counting.
+
+\subsubsection{Suggestion for an algorithm}
+The idea of the algorithm is basically the same as for the sequntial $strong\_4clique\_finder++$ algorithm but now, in order to distribute data from the graph to different machines, we split up the computations into 3 map/reduce iterations or rounds. For emitting and receiving the data we use key/value pairs e.g. $\langle vertex1,vertex2\rangle :\$$ where the key is an edge pair. The $\$$ sign defines a possible value.
+
+\paragraph{Round 1}
+In the first round we map edges from the graph, but using the lowest degree function we ensure that we only emit the same edge once e.g. $\langle v,u\rangle$ and not $\langle u,v\rangle$ assuming that in this case $v$ has a lower degree than $u$. We also emit a key/value pair $\langle v,\$\rangle :u$ where the key is a possible edge pair and $u$ is an adjacent node. In this way we make $v$, the lowest degree node, responsible for finding a node that closes the triangle and later on the 4-clique. After some shuffling the reducer will receive a list of adjacent nodes for one possible edge $\langle v,\$\rangle$ and from this list we emit paths e.g. $\langle x,y\rangle :v$ and again make sure that we don't emit the same edge twice this time using $id_x < id_y$. If the value is $\$$ we just propogate the key/value pair to the next round.
+
+\paragraph{Round 2}
+We simply propogate the pairs in the mapping phase of round 2. In the reducer we check that the pairs emitted from round 1 is actually connected. This is done by removing and propogating the $\$$ from the pair $\langle v,u\rangle$ and if there are still values left, these are the vertices that connects to both vertices in the pair i.e. they close a triangle. We then iterate as in round 1 through these adjacent nodes and emit possible pairs, only this time with the key pair as value e.g. $\langle x,y \rangle :\langle v,u \rangle$.
+
+\paragraph{Round 3}
+
 
 \begin{algorithm}
 \caption{$mr\_strong\_4clique\_finder$}
@@ -213,12 +224,12 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 		\STATE $emit(\langle v,\$\rangle :u)$
 		\STATE $emit(\langle v,u>\rangle \$)$
 	\ENDIF
-\REQUIRE REDUCE 1: $\langle v,u\rangle :v_{adj} = [v_1,v_2,...]$
+\REQUIRE REDUCE 1: $\langle v,u\rangle :u_{adj} = [u_1,u_2,...]$
 	\IF{$u != \$$}
 		\STATE $emit(\langle v,u \rangle:\$)$
-		\FOR{$x \in v_{adj}$}
-			\FOR{$y \in v_{adj}$}
-				\IF{$lower\_degree(x,y)$}
+		\FOR{$x \in u_{adj}$}
+			\FOR{$y \in u_{adj}$}
+				\IF{$id_x < id_y$}
 					\STATE $emit(\langle x,y\rangle :v)$
 				\ENDIF
 			\ENDFOR
@@ -253,22 +264,6 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Idea}
-- we want to find 2 triangles that share 2 of the same nodes, then we can check if the remaining 2 nodes of the triangles are connected
-- there are 4 triangles in clique - 4 choose 2 = 6 edges
-- We only want to check 1 node pair for each clique
-- we make the lowest degree node of each triangle responsible for finding a node that completes the clique (i.e. find a triangle that shares 2 of the same nodes)
-- The clique will then only get counted 1 time
-
-\subsubsection{Proof}
-- We know we have counted each triangle 1 time
-- By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
-
-lowest id
-for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
-
-
-
 \subsubsection{Analysis}
 TODO: Number of rounds, time complexity etc...
 
@@ -277,6 +272,12 @@ Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a gra
 Space: The lower degree function, each vertex must have a degree attached
 
 Shuffling: remove redundant? e.g. $\langle a,b\rangle$ : \$ will be sent from both abc and abd
+
+- We know we have counted each triangle 1 time
+- By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
+
+lowest id
+for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
 
 
 \section{Conclusion}
