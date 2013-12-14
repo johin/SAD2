@@ -236,7 +236,7 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 	\ENDIF
 
 \REQUIRE MAP 3: $\langle v,u,w\rangle :\$$
-	\IF{$v < u < w$}
+	\IF{$lower\_degree(lower\_degree(v, u), w)$}
 		\STATE $emit(\langle v,w \rangle :v)$
 		\STATE $emit(\langle v,u \rangle :\$)$
 	\ENDIF
@@ -255,16 +255,16 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 			\ENDIF
 		\ENDFOR
 	\ENDFOR
-	
+
 \REQUIRE MAP 4: $\langle v,u\rangle :t$
 	\STATE $emit(\langle v,u\rangle :t)$
 \REQUIRE REDUCE 4 $\langle v,u\rangle :t$
-	\STATE $best_clique = \langle empty\rangle$
+	\STATE $best\_clique = \langle empty\rangle$
 	\IF{$\$ \in t$}
 		\STATE remove \$ from vertices
 		\IF{$length(t) > 0$}
-			\IF{$W(t[0]) > W(best_{clique})$}
-				\STATE $best_{clique} = t[0]$
+			\IF{$W(t[0]) > W(best\_clique)$}
+				\STATE $best\_clique = t[0]$
 			\ENDIF
 			\STATE $emit(\langle v,u,w\rangle :\$)$
 		\ENDIF
@@ -282,6 +282,9 @@ We come with a suggestion for finding strong 4cliques with MapReduce. It is base
 \subsubsection{Proof}
 - We know we have counted each triangle 1 time
 - By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
+
+lowest id
+for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
 
 
 
