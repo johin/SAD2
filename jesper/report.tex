@@ -12,7 +12,7 @@
 \renewcommand{\algorithmicforall}{\textbf{for each}}
 
 \title{The search for strong 4-cliques in Hollywood.}
-\author{Jonas Hinge (jhin), Jesper Jensen (jejen),  Thomas Snaidero (tsna)}
+\author{Thomas Snaidero (tsna), Jesper Jensen (jejen), Jonas Hinge (jhin)}
 \date{December 2013}
 
 \begin{document}
@@ -20,6 +20,7 @@
 \maketitle
 
 \section{Introduction}
+TODO: JESPER
 The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
 
 \subsection{Hollywood as a social network}
@@ -28,34 +29,52 @@ The growth rate of a social network is very fast as every new node often is conn
 
 
 \subsection{Finding strong 4-cliques}
-We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood all inclusive, this graph will form a social network of actors based on the following.
-Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie. To define how strong the tie between two actors, we use the number of movies that they have stared in together as weight on the edge between them.
+A 4-clique consist of 4 actors where each actor-pair has played in the same movie. e.g. 
 
-TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
+TODO: figure with real names...
+
+We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theises is: stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood, this graph will form a social network of actors based on the following.
+Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie.
+To define how strong the tie between two actors is, we use the number of movies that they have stared in together as weight on the edge between them.
 
 \subsection{Basic notations}
-We define a graph G with vertices V and edges E.
+TODO: JONAS
+We define the hollywood social network as an undirected graph G with vertices V and edges E.
+Edges have weights TODO: write...
+
+Number of vertices is written as n and edges as m
 
 TODO: Add what we need to define, maybe at the end of the project process
 
+T = triangles
+W = weight function, list pseudo code
+v,u,w,z = vertices in the graph
+e.g. <v,u> is an edge, <v,u,w> is a triangle etc explain correctly...
+e.g. $v_{adj}$ is the neighbouring vertices of v from the graph G
+D = degree function
+A strong clique = we define a weight function of a clique to give a strongness value
+\$ value in mapreduce
+
 
 \section{A sequential algorithm}
+Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this case we just return one of the strongest 4-cliques.
 
 \subsection{Naive first attempt}
-Our bruteforce algorithm.... (NOT CORRECT YET!)
+An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph V,E as input.
 
 \begin{algorithm}
-\caption{$Naive Max Edgeweighted 4Clique(G)$}
+\caption{$strong\_4clique\_finder$}
 \begin{algorithmic}
-\STATE $Cl = dictionary$
-\FOR{$v, v_neighbours \in G$}
-\FOR{$u, u_wt \in v_neighbours$}
-\FOR{$w, w_wt \in v_neighbours$}
-\IF{$w \in G[u]$}
-\FOR{$z, z_wt \in v_neighbours$}
-\IF{$z \in G[w] \and z \in G[u] \and z != w \and z != u$}
-\IF{$Get Clique Weight(G,v,u,w,z) > Cl$}
-\STATE $Cl = ((v,u,w,z),Get Clique Weight(G,v,u,w,z))$
+\REQUIRE $G$
+\STATE $best\_clique = \langle empty\rangle $
+\FOR{$v \in V$}
+\FOR{$u \in v_{adj}$}
+\FOR{$w \in v_{adj}$}
+\IF{$w \in u_{adj}$}
+\FOR{$z \in v_{adj}$}
+\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$}
+\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = \langle v,u,w,z\rangle $
 \ENDIF
 \ENDIF
 \ENDFOR
@@ -63,51 +82,220 @@ Our bruteforce algorithm.... (NOT CORRECT YET!)
 \ENDFOR
 \ENDFOR
 \ENDFOR
-\RETURN $Cl$
-
+\RETURN $best\_clique$
 \end{algorithmic}
 \end{algorithm}
 
+\subsubsection{Analysis}
+In the worst case a vertex v will have $n-1$ adjacent vertices, so for every v we have $O(n^{3})$ resulting in a total running time of $O(n^{4})$. This is not an attractive result as this easily could end up never executing especially with massive graphs with large n and m. We also note that as we are checking every node in a clique for all possible combinations to define this clique we actually count the same clique $4! = 24$ times.
+
 \subsection{A better approach extending triangle counting}
+Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast algorithm for finding triangles in a graph. A triangle is close to a 4-clique we only need 1 node that in turn should be connected to all 3 nodes in the triangle.
+
+\subsubsection{Intersection idea}
+We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles. These are found by NodeIterator++ \cite{countingTriangles}.
+
+\begin{algorithm}
+\caption{$strong\_4clique\_finder+$}
+\begin{algorithmic}
+\REQUIRE $G,T$
+\STATE $best\_clique = \langle empty\rangle $
+\FOR{$<v,u,w> \in T$}
+\STATE $intersection\_list = intersect(v_{adj}, u_{adj}, w_{adj})$
+\IF{$intersection\_list > 0$}
+\FOR{$z \in intersection\_list$}
+\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = \langle v,u,w,z\rangle $
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\RETURN $best\_clique$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Analysis}
+We know from \cite{countingTriangles} that counting the triangles runs in $O(m^{3/2})$. For each triangle we make an intersection $O(n)$ and run through this intersected list $O(n)$ resulting in $O(2n)$ or just $O(n)$. So the total running time for finding strong 4-cliques is $O(nm^{3/2})$. We note that NodeIterator++ claims to count each triangle only 1 time. As a 4-clique contains 4 unique triangles and we are iterating all triangles, we see that each 4-clique is counted 4 times.
 
 \subsection{Adapting the triangle counting approach}
+We seek to optimize the algorithm further as we wish to count each 4-clique only 1 time. If we dig deeper into the triangle counting algorithm NodeIterator++ \cite{countingTriangles} we notice a method that could apply for finding 4-cliques as well.
+
+\subsubsection{Lowest degree node responsibility}
+Schank \cite{AlgorithmicAspects} proposed that the lowest degree node in each triangle be “responsible” for making sure the triangle gets counted. From this we define a lower degree function.
+
+\begin{algorithm}
+\caption{$lower\_degree$}
+\begin{algorithmic}
+\REQUIRE $v,u$
+\IF{$length(v_{adj)} < length(u_{adj})$}
+\RETURN $True$
+\ELSIF{$length(v_{adj)} == length(u_{adj})$ \AND $id_{v} < id_{u}$}
+\RETURN $True$
+\ELSE
+\RETURN $False$
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+We implement this degree function to the naive first algorithm so before iterating adjacent nodes we make sure that the lowest degree node is responsible for counting the possible 4-clique.
+
+\begin{algorithm}
+\caption{$strong\_4clique\_finder++$}
+\begin{algorithmic}
+\REQUIRE $G$
+\STATE $best\_clique = \langle empty\rangle $
+\FOR{$v \in V$}
+\FOR{$u \in v_{adj}$}
+\IF{$lower\_degree(G,v,u)$}
+\FOR{$w \in v_{adj}$}
+\IF{$w \in u_{adj}$ \AND $lower\_degree(G,u,w)$}
+\FOR{$z \in v_{adj}$}
+\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$ \AND $lower\_degree(G,w,z)$}
+\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+\STATE $best\_clique = \langle v,u,w,z\rangle $
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDFOR
+\RETURN $best\_clique$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Analysis}
+It can be proved that when using the lowest degree responsibility trick a vertex will have a degree of $O(\sqrt[]{m})$ \cite{AlgorithmicAspects}. As we are using this trick but in 4 nested iterations through the adjacent nodes of a vertex v we will end up with a running time of $O(\sqrt[]{m}\sqrt[]{m}\sqrt[]{m}\sqrt[]{m})$ or just $O(m^{2})$. We also note that this way ensures that each 4-clique is counted only 1 time.
+
 
 \subsection{Implementation and results}
+TODO: JONAS
+TODO: Graph is build as an adjacency list, show example of some vertices and their $<edge;weight>$ hashset...
+key = $actorid\_firstname\_lastname$
+Datastructure calculating degree - only possible this way with a data set that can fit into memory
 
 \section{A parallel algorithm using MapReduce}
 
 \subsection{MapReduce basics}
-Network analysis of eg. interconnected networks like the Internet for web pages and meta data to build a search engine or of a social network like Facebook, twitter or Instagram provides a challenge for even high power servers. To solve this problem Google engineers founded and implemented MapReduce. MapReduce is a programming model inspired by functional programming founded in the 60's. It's designed for large-scale data processing and designed to run on clusters of commodity hardware hence it does not require high power servers or HPC clusters to run.
-In more details, MapReduce is a programming framework that provides the capability of cluster computations. MapReduce keeps track of synchronization and data across the clusters, this eases the burden of the programmers and makes it's easier than maltreated programming to implement.
-
-\noindent MapReduce accepts other functions as arguments for further decomposition of problem. The two main functions in MapReduce is the Map function and the Fold / Reduce function, in between the Map and the Recude a shuffeling actions is executed to allign the keys for each Reduce function so that one Reduce function handles one key.
-
-
+As is the algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run distributed and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the nedded functionality and enable us to traverse the entire graph in a resonable running time.
 
 \subsubsection{Map function}
 The MapFunction build an associative array from the input and emits key, value paris.
 
-
-
 \subsubsection{Shuffle}
 After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
-
 
 \subsubsection{Fold (Reduce) Function}
 The Reduce function unions the input data by counting the occurence of a given key and emmitning a single $<key,value>$ pair containing the input key and the number of occrurences the input.
 
-
-
-
 TODO: Shorter more precise
 
+\subsection{Finding strong 4cliques using MapReduce}
+TODO: JONAS
+We come with a suggestion for finding strong 4cliques with MapReduce. It is based on the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles, we pass them on to another round.
 
-TOOD: Write
+\begin{algorithm}
+\caption{$mr\_strong\_4clique\_finder$}
+\begin{algorithmic}
+\REQUIRE $G$
+	
+\REQUIRE MAP 1: $\langle v,u\rangle :\$$
+	\IF{$lower\_degree(v,u)$}
+		\STATE $emit(\langle v,\$\rangle :u)$
+		\STATE $emit(\langle v,u>\rangle \$)$
+	\ENDIF
+\REQUIRE REDUCE 1: $\langle v,u\rangle :v_{adj} = [v_1,v_2,...]$
+	\IF{$u != \$$}
+		\STATE $emit(\langle v,u \rangle:\$)$
+		\FOR{$x \in v_{adj}$}
+			\FOR{$y \in v_{adj}$}
+				\IF{$id_{x} < id_{y}$}
+				\STATE $emit(\langle x,y\rangle :v)$
+				\ENDIF
+			\ENDFOR
+		\ENDFOR
+	\ENDIF
+
+\REQUIRE MAP 2: $\langle v,u\rangle :w$
+	\STATE $emit(\langle v,u\rangle :w)$
+\REQUIRE REDUCE 2: $\langle v,u\rangle : vertices = [w_1,w_2,...]$
+	\IF{$\$ \in vertices$}
+		\STATE remove \$ from vertices
+		\IF{$length(vertices) > 0$}
+			\STATE $emit(\langle v,u,w\rangle :\$)$
+		\ENDIF
+	\ENDIF
+
+\REQUIRE MAP 3: $\langle v,u,w\rangle :\$$
+	\IF{$lower\_degree(lower\_degree(v, u), w)$}
+		\STATE $emit(\langle v,w \rangle :v)$
+		\STATE $emit(\langle v,u \rangle :\$)$
+	\ENDIF
+\REQUIRE REDUCE 3: $\langle v,u\rangle :vertices = [vu_1,vu_2,...]$
+	\ENSURE vertices does not contain redundant \$
+	\FOR{$i \in vertices$}
+		\IF{$i == \$$}
+			\STATE $emit(\langle v,u\rangle :\$)$
+			\STATE remove \$ from vertices
+		\ENDIF
+	\ENDFOR
+	\FOR{$x \in vertices$}
+		\FOR{$y \in vertices$}
+			\IF{$id_x < id_y$}
+				\STATE $emit(\langle x,y\rangle :\langle v,u,x,y\rangle)$
+			\ENDIF
+		\ENDFOR
+	\ENDFOR
+
+\REQUIRE MAP 4: $\langle v,u\rangle :t$
+	\STATE $emit(\langle v,u\rangle :t)$
+\REQUIRE REDUCE 4 $\langle v,u\rangle :t$
+	\STATE $best\_clique = \langle empty\rangle$
+	\IF{$\$ \in t$}
+		\STATE remove \$ from vertices
+		\IF{$length(t) > 0$}
+			\IF{$W(t[0]) > W(best\_clique)$}
+				\STATE $best\_clique = t[0]$
+			\ENDIF
+			\STATE $emit(\langle v,u,w\rangle :\$)$
+		\ENDIF
+	\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Idea}
+- we want to find 2 triangles that share 2 of the same nodes, then we can check if the remaining 2 nodes of the triangles are connected
+- there are 4 triangles in clique - 4 choose 2 = 6 edges
+- We only want to check 1 node pair for each clique
+- we make the lowest degree node of each triangle responsible for finding a node that completes the clique (i.e. find a triangle that shares 2 of the same nodes)
+- The clique will then only get counted 1 time
+
+\subsubsection{Proof}
+- We know we have counted each triangle 1 time
+- By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
+
+lowest id
+for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
 
 
-\section{Discussion}
+
+\subsubsection{Analysis}
+TODO: Number of rounds, time complexity etc...
+
+Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles or $n-2$ or $O(m)$
+
+Space: The lower degree function, each vertex must have a degree attached
+
+Shuffling: remove redundant? e.g. $\langle a,b\rangle$ : \$ will be sent from both abc and abd
+
 
 \section{Conclusion}
+TODO: We can conclude....
+Optimal running time for finding a strong 4cliques is...
+Maybe we could improve the space complexity by using something else than adjacency list?
+Add a heuristic: < 4 degree nodes are not necessary to examine (I AM NOT SURE.....)
+Could the weights be included in the determination faces of the algorithms?
 
 \begin{thebibliography}{1}
 
@@ -122,14 +310,29 @@ TOOD: Write
     \url{http://en.wikipedia.org/wiki/Social_graph}
 
 \bibitem{lnMapReduce}
-    Lecture notes: Slides MapReduce lecture
+    Lecture notes: MapReduce
     \emph{MapReduce}
     \url{https://blog.itu.dk/SAD2-E2013/files/2013/11/mapreduce.pdf}
+
+\bibitem{countingTriangles}
+    Siddharth Suri and Sergei Vassilvitskii
+    \emph{Counting Triangles and the Curse of the Last Reducer}
+    \url{http://theory.stanford.edu/~sergei/papers/www11-triangles.pdf}
+
+\bibitem{AlgorithmicAspects}
+    Thomas Schank
+    \emph{Algorithmic Aspects of Triangle-Based Network Analysis}
+    \url{http://digbib.ubka.uni-karlsruhe.de/volltexte/documents/4541}
     
 \end{thebibliography}
 
 \end{document}
 
 
-%Funny trivia:
-All movies from 2005 7 mins. 11 sec. runtime
+
+% TODO INTERNAL
+% MapReduce algorithm find a better way to display MAP and REDUCE
+% Algorithms are now floating, give arguments to them to display them properly
+
+
+
