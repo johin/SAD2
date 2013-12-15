@@ -174,19 +174,19 @@ For building the graph we use an adjacency list consisting of a dictionary with 
 \begin{lstlisting}
 
 G = {426628_Arnold_Schwarzenegger : {
- 		{451117_Sylvester_Stallone : 6 },
- 		{452242_Jason_Statham : 2 },
- 		{277570_Jet_Li : 2 }
- 		{ ... : ... }
+ 		 {451117_Sylvester_Stallone : 6 },
+ 		 {452242_Jason_Statham : 2 },
+ 		 {277570_Jet_Li : 2 },
+ 		 { ... : ... }
  		}
- 	}
- 	{287328_Dolph_Lundgren : {
- 		{451117_Sylvester_Stallone : 1 },
- 		{487218_Jean-Claude_Van Damme : 4}
- 		{277570_Jet_Li : 2 }
- 		{ ... : ... }
- 	}
-
+ 	},	
+	{287328_Dolph_Lundgren : {
+		 {451117_Sylvester_Stallone : 1 },
+		 {487218_Jean-Claude_Van Damme : 4},
+	 	 {277570_Jet_Li : 2 },
+	 	 { ... : ... }
+	 	}
+	}
  \end{lstlisting}
 
 \section{A parallel algorithm using MapReduce}
@@ -290,7 +290,7 @@ Pair numbers describe the max number of pairs we map in a round. This is importa
 
 \subsection{Results}
 
-The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.
+The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.\newline
 
 \emph{IMDB Dataset : Year 2006 - 2008}
 \begin{center}
@@ -314,7 +314,7 @@ The implemented algorithms are benchmarked agains eachother to validate the inte
     \end{tabular}
 \end{center}
 
-When we extend the dataset beyond 2005, the graph grows to large to process within resonable time on regular laptops.
+When we extend the dataset beyond 2005, the graph grows to large to process within resonable time on regular laptops. To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible. (Måske i konklusion i stedet?)
 
 \section{Conclusion}
 TODO: We can conclude....
