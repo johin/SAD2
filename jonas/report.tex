@@ -167,6 +167,9 @@ We implement this degree function to the naive first algorithm so before iterati
 \subsubsection{Analysis}
 It can be proved that when using the lowest degree responsibility trick a vertex will have a degree of $O(\sqrt[]{m})$ \cite{AlgorithmicAspects}. As we are using this trick but in 4 nested iterations through the adjacent nodes of a vertex v we will end up with a running time of $O(\sqrt[]{m}\sqrt[]{m}\sqrt[]{m}\sqrt[]{m})$ or just $O(m^{2})$. We also note that this way ensures that each 4-clique is counted only 1 time as we in each iteration make 1 node responsible for completing the 4-clique.
 
+\subsection{Space complexity}
+For all 3 sequential algorithms we require a graph G as input. The running time complexity of the algorithms all assume that the graph G is build as an adjacency list so that for each vertice we have adjacent edges. This demands a space complexity of $O(mn)$. So running these sequential algorithms will require a very powerful machine with loads of memory as graph and especially social network graphs can be massive.
+
 
 \subsection{Implementation and results}
 We have implemented and compaired the sequential algorithms. The programming language used is Python 2.7 and the code is available at github \cite{gitcode}.
@@ -319,6 +322,9 @@ Pair numbers describe the max number of pairs we map in a round. This is importa
 \section{Conclusion}
 
 \textbf{Results} \newline
+We have in this project explored different ways of constructing algorithms that returns the strongest 4-cliques in a graph. After 3 iterations we developed a sequential algorithm that is optimal in the sense that it only counts the 4-cliques 1 time each. It had a time complexity of 
+
+RESULTS...
 To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible.\newline
 
 \noindent \textbf{Runningtimes} \newline
