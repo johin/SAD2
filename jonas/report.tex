@@ -271,33 +271,19 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 \end{algorithm}
 
 \subsubsection{Analysis}
-We use 4 parameters when analysing the mapreduce algorithm; round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$.
+We use 4 parameters when analysing the mapreduce algorithm; round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(\sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$. With this way we also make sure that each 4-clique is only counted 1 time.
 
 \paragraph{Round numbers}
 As a mapreduce round can involve shuffling terabytes of data the number of rounds should remain constant or in the worst case logarithmic. In our case we stay at 3 rounds constantly.
 
 \paragraph{Work per reducer}
-The reducer with the worst running time. In our case we have round 2 and round 3 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(sqrt[]{m}sqrt[]{m})$ or just $O(m)$.
+The reducer with the worst running time. In our case we have round 2 and round 3 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(\sqrt[]{m}\sqrt[]{m})$ or just $O(m)$.
 
 \paragraph{Total work}
-The total work is the sum of the worst running time for each round. 
+The total work is the worst running for a round. Round 1 and round 2 are both $O(m)$ and the number of pairs to examine is the max number of edges $O(\sqrt[]{m})$ so in total $O(m\sqrt[]{m})$.
 
 \paragraph{Pair numbers}
-
-
-TODO: Number of rounds, time complexity etc...
-
-Reduce round 4: Imagine in the worst case all triangles ([<u,v,w>],...) in a graph share two nodes (figure), then the key <u,v> will have a list of adjacent nodes corresponding to the max number of triangles or $n-2$ or $O(m)$
-
-Space: The lower degree function, each vertex must have a degree attached
-
-Shuffling: remove redundant? e.g. $\langle a,b\rangle$ : \$ will be sent from both abc and abd
-
-- We know we have counted each triangle 1 time
-- By making the lowest node in a triangle responsible for connecting to another triangles lowest degree node we make sure that the clique is only counted 1 time as only this connection (or edge) is counted 1 time.
-
-lowest id
-for each triangle we make 1 node responsible for connecting with other triangles lowest id node. So the reducer in round 4 will have at max a list of n nodes and as we need to search
+Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive.
 
 
 
