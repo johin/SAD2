@@ -104,9 +104,9 @@ def node_iterator_plus_plus_extension_4cliques(G):
 							for z, z_wt in v_neighbours.iteritems():
 								#if(z.split("_")[0] > w.split("_")[0]):
 								if(higher_degree(G,z,w)):
-									run_count += 1
+									#run_count += 1
 									if(z in G[w] and z in G[u]):
-										update_discovered(cliques_total,v,u,w,z,get_clique_weight(G,v,u,w,z))
+										#update_discovered(cliques_total,v,u,w,z,get_clique_weight(G,v,u,w,z))
 										if(get_clique_weight(G,v,u,w,z) > current_clique[1]):
 											current_clique = ((v,u,w,z),get_clique_weight(G,v,u,w,z))
 											print "Found a clique higher: " + "v: " + v + ", u: " + u + ", w: " + w + ", z: " + z

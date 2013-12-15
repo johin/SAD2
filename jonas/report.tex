@@ -21,12 +21,12 @@
 \maketitle
 
 \section{Introduction}
-The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
-To get the best interview with a possible best trivia, the journalist at the award show needs to know which actors are connected and how close or tight they are connected. This connection between actors in Hollywood has some resemblance to a social network.
+The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But which actors are the best fit for an interview and which actors could provide the best trivia?
+To get the best interview with a possible best trivia, the journalist at the award show needs to know which actors are related to each other and how string these relations are. This connection between actors in Hollywood has some resemblance to a social network.
 
 \subsection{Hollywood as a social network}
 A social network has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. friends, collegues, home city or common interests.
-The growth rate of a social networks density is commonly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment the Hollywood sceene is considered a social network of actors tied together by the movies they have appeared in together.
+The growth rate of a social networks density is commonly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment the Hollywood scene is considered a social network of actors tied together by the movies they have appeared in together.
 
 \subsection{Finding strong 4-cliques}
 A 4-clique consist of 4 actors where each actor-pair has played in the same movie as shown in figure \ref{fig: 4clique example}.
@@ -39,7 +39,7 @@ A 4-clique consist of 4 actors where each actor-pair has played in the same movi
 \label{fig: 4clique example}
 \end{figure}
 
-We want to provide a tool, for finding the cliques of 4 actors that have strong ties to one another. The theses is: Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on a cleaned IMDB dataset \cite{imdb}.
+We want to provide a tool, for finding the cliques of 4 actors that have strong ties to one another. The theses is: Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the social network of Hollywood. This network is based on a cleaned IMDB dataset \cite{imdb}.
 Each node in the graph is an actor. An Edge is formed if two actors have stared in the same movie. To define how strong the tie between these 2 actors is, we use the number of movies that they have stared together as weight on the edge between them. For a 4-clique, the strength of the clique is defined as the median value of the edges in the clique.
 
 \subsection{Basic notations}
@@ -110,7 +110,7 @@ We see that if each node in a triangle has a common neighbour node this must clo
 \end{algorithm}
 
 \subsubsection{Analysis}
-We know from \cite{countingTriangles} that counting the triangles runs in $O(m^{3/2})$. For each triangle we make an intersection $O(n)$ and run through this intersected list $O(n)$ resulting in $O(2n)$ or just $O(n)$. So the total running time for finding strong 4-cliques is $O(nm^{3/2})$. We note that NodeIterator++ claims to count each triangle only 1 time. As a 4-clique contains 4 unique triangles and we are iterating all triangles, we see that each 4-clique is counted 4 times.
+We know from \cite{countingTriangles} that counting the triangles runs in $O(m^{3/2})$. For each triangle we make an intersection $O(n)$ and run through this intersected list $O(n)$ resulting in $O(2n)$ or just $O(n)$. So the total running time for finding strong 4-cliques is $O(nm^{3/2})$. We note that NodeIterator++ claims to count each triangle only 1 time. As a 4-clique contains 4 unique triangles and we are iterating all triangles, we find that each 4-clique is counted 4 times.
 
 \subsection{Adapting the triangle counting approach}
 We seek to optimize the algorithm further as we wish to count each 4-clique only 1 time. If we dig deeper into the triangle counting algorithm NodeIterator++ \cite{countingTriangles} we notice a method that could apply for finding 4-cliques as well.
@@ -166,7 +166,7 @@ We implement this degree function to the naive first algorithm so before iterati
 It can be proved that when using the lowest degree responsibility trick a vertex will have a degree of $O(\sqrt[]{m})$ \cite{AlgorithmicAspects}. As we are using this trick but in 4 nested iterations through the adjacent nodes of a vertex v we will end up with a running time of $O(\sqrt[]{m}\sqrt[]{m}\sqrt[]{m}\sqrt[]{m})$ or just $O(m^{2})$. We also note that this way ensures that each 4-clique is counted only 1 time as we in each iteration make 1 node responsible for completing the 4-clique.
 
 \subsection{Space complexity}
-For all 3 sequential algorithms we require a graph G as input. The running time complexity of the algorithms all assume that the graph G is build as an adjacency list so that for each vertice we have adjacent edges. This demands a space complexity of $O(mn)$. So running these sequential algorithms will require a very powerful machine with loads of memory as graph and especially social network graphs can be massive.
+For all 3 sequential algorithms we require a graph G as input. The running time complexity of the algorithms all assume that the graph G is build as an adjacency list so that for each vertex we have adjacent edges. This demands a space complexity of $O(mn)$. So running these sequential algorithms will require a very powerful machine with loads of memory as graph and especially social network graphs can be massive.
 
 
 \subsection{Implementation and results}
@@ -193,11 +193,14 @@ G = {426628_Arnold_Schwarzenegger : {
 	}
  \end{lstlisting}
 
+With this datastructure we can calculate the weight of a clique in constant time.
+
 \subsubsection{Results}
 
-The implemented algorithms are benchmarked to measure the running time for each version of the algorithm, hence giving us the abillity to quantify the performance enhancement through each iteration. The first benchmark is performed on a small dataset - the dataset is then extended and benchmarked again.\newline
+The implemented algorithms are benchmarked to measure the running time for each version of the algorithm, hence giving us the abillity to quantify the performance enhancement through each iteration. The first benchmark is performed on a small dataset - the dataset is then extended and benchmarked again. The results are shown on page: \pageref{result1}.\newline
 
 \textbf{IMDB Dataset : Year 2006 - 2008}
+\label{result1}
 \begin{center}
     \begin{tabular}{ | l | l | l | l | l |}
     \hline
@@ -224,7 +227,7 @@ When we extend the dataset beyond 2005, the graph grows to large to process with
 \section{A parallel algorithm using MapReduce}
 
 \subsection{MapReduce basics}
-The algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run in parallel and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the needed functionality and enable us to traverse the entire graph in a resonable running time.
+The algorithms that we have provided are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run in parallel and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the needed functionality and enable us to traverse the entire graph in a resonable running time.
 
 \subsubsection{Map function}
 The input in the map function is processed 1 tuple at a time. This allows distributing different tuples over multiple machines and creates the opportunity for massive parallelization. Each mapper emits a key,value pair which is then passed on to the shuffle phase.
@@ -239,16 +242,17 @@ The reducer processes each key along with all of its values associated with it t
 We come with a suggestion for finding strong 4-cliques with MapReduce. It is strongly inspired from the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles we search for strong 4-cliques but using the same techinques as for triangle counting.
 
 \subsubsection{Suggestion for an algorithm}
-The idea of the algorithm is basically the same as for the sequntial $strong\_4clique\_finder++$ algorithm but now, in order to distribute data from the graph to different machines, we split up the computations into 3 map/reduce iterations or rounds. For emitting and receiving the data we use key/value pairs e.g. $\langle vertex1,vertex2\rangle :\$$ where the key is an edge pair. The $\$$ sign defines a possible value.
+The idea of the algorithm is basically the same as for the sequntial $strong\_4clique\_finder++$ algorithm but now, in order to distribute data from the graph to different machines, we split up the computations into 3 map/reduce iterations or rounds. For emitting and receiving the data we use key/value pairs e.g. $\langle vertex1,vertex2\rangle :\$$ where the key is an edge pair. The $\$$ sign defines a possible value. The pseudo code of the algorithm $mr\_strong\_4clique\_finder$ is shown on page: \pageref{mrAlgorithm}.
 
 \paragraph{Round 1}
-In the first round we map edges from the graph, but using the lowest degree function we ensure that we only emit the same edge once e.g. $\langle v,u\rangle$ and not $\langle u,v\rangle$ assuming that in this case $v$ has a lower degree than $u$. We also emit a key/value pair $\langle v,\$\rangle :u$ where the key is a possible edge pair and $u$ is an adjacent node. In this way we make $v$, the lowest degree node, responsible for finding a node that closes the triangle and later on the 4-clique. After some shuffling the reducer will receive a list of adjacent nodes for one possible edge $\langle v,\$\rangle$ and from this list we emit paths e.g. $\langle x,y\rangle :v$ and again make sure that we don't emit the same edge twice using $lower\_degree(x,y)$. By doing this we also ensure that the ordering of $v,u$ is the same as the emitted $emit(\langle v,u\rangle :\$)$ as these keys needs to match in order to collect adjacent values in a list in the following rounds. If the value is $\$$ we just propogate the key/value pair to the next round.
+In the first round we map edges from the graph, but using the lowest degree function we ensure that we only emit the same edge once e.g. $\langle v,u\rangle$ and not $\langle u,v\rangle$ assuming that in this case $v$ has a lower degree than $u$. We also emit a key/value pair $\langle v,\$\rangle :u$ where the key is a possible edge pair and $u$ is an adjacent node. In this way we make $v$, the lowest degree node, responsible for finding a node that closes the triangle and later on the 4-clique. After some shuffling the reducer will receive a list of adjacent nodes for one possible edge $\langle v,\$\rangle$ and from this list we emit paths e.g. $\langle x,y\rangle :v$ and again make sure that we don't emit the same edge twice using $lower\_degree(x,y)$. By doing this we also ensure that the ordering of $v,u$ is the same as the propogated $\langle v,u\rangle :\$$ as these keys needs to match in order to collect adjacent values in a list in the following rounds.
+If the value in the reducer is $\$$ we simply propogate the key/value pair to the next round.
 
 \paragraph{Round 2}
-We simply propogate the pairs in the mapping phase of round 2. In the reducer we check that the pairs emitted from round 1 is actually connected. This is done by removing and propogating the $\$$ from the pair $\langle v,u\rangle$ and if there are still values left, these are the vertices that connects to both vertices in the pair i.e. they close a triangle. We then iterate as in round 1 through these adjacent nodes and emit possible pairs, only this time with the key pair as value e.g. $\langle x,y \rangle :\langle v,u \rangle$.
+We simply propogate the pairs in the mapping phase of round 2. In the reducer we check that the pairs emitted from round 1 are actually connected. This is done by removing the $\$$ from the pair $\langle v,u\rangle$, propogate it, and if there are still values left, these are the vertices that connects to both vertices in the pair i.e. they close a triangle. We then iterate as in round 1 through these adjacent nodes and emit possible pairs, only this time with the key pair as value e.g. $\langle x,y \rangle :\langle v,u \rangle$.
 
 \paragraph{Round 3}
-As for the last round we simply propogate pairs in the mapper of round 3. In the reducing part we need to check, like in the triangle case last round, if the possible pairs we emitted are actually connected. If they are they will close a 4-clique. We do this by checking if there exist a $\$$ in the value list of the possible pairs and if so, we remove it and iterate through the list. This time the values will be pairs $\langle w,z \rangle$ and they are the ones closing a 4-clique $\langle v,u,w,z \rangle$. While iterating we keep track of the 4-clique with max weight. The pseudo code of the algorithm $mr\_strong\_4clique\_finder$ is shown on page \pageref{mrAlgorithm}.
+As for the last round we simply propogate pairs in the mapper of round 3. In the reducing part we need to check, like in the triangle case last round, if the possible pairs we emitted are actually connected. If they are they will close a 4-clique. We do this by checking if there exist a $\$$ in the value list of the possible pairs and if so, we remove it and iterate through the list. This time the values will be pairs $\langle w,z \rangle$ and they are the ones closing a 4-clique $\langle v,u,w,z \rangle$. While iterating we keep track of the 4-clique with max weight.
 
 \begin{algorithm}
 \label{mrAlgorithm}
@@ -304,7 +308,7 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 \end{algorithm}
 
 \subsubsection{Analysis}
-We use 4 parameters when analysing the mapreduce algorithm; round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(\sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$. With this way we also make sure that each 4-clique is only counted 1 time.
+We use 4 parameters when analysing the mapreduce algorithm; round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(\sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$. In this way we also make sure that each 4-clique is only counted 1 time.
 
 \paragraph{Round numbers}
 As a mapreduce round can involve shuffling terabytes of data the number of rounds should remain constant or in the worst case logarithmic. In our case we stay at 3 rounds constantly.
