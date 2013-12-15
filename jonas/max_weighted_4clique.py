@@ -8,7 +8,7 @@ USE_CACHE = False
 
 SQL_GET_ALL_MOVIES = """
 	SELECT id FROM movies
-	WHERE year >= 2005
+	WHERE year >= 2004
 """
 
 SQL_GET_ROLES_OF_MOVIE = """
