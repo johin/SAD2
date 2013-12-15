@@ -173,10 +173,15 @@ For building the graph we use an adjacency list consisting of a dictionary with 
 
 \begin{lstlisting}
 
-G = 426628_Arnold_Schwarzenegger : {
- 		{451117_Sylvester_Stallone : 6 },
+G = {426628_Arnold_Schwarzenegger : {
  		{451117_Sylvester_Stallone : 6 },
  		{452242_Jason_Statham : 2 },
+ 		{277570_Jet_Li : 2 }
+ 		}
+ 	}
+ 	{287328_Dolph_Lundgren : {
+ 		{451117_Sylvester_Stallone : 1 },
+ 		{487218_Jean-Claude_Van Damme : 4}
  		{277570_Jet_Li : 2 }
  	}
 
@@ -281,7 +286,33 @@ The total work is the worst running for a round. Round 1 and round 2 are both $O
 \paragraph{Pair numbers}
 Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive.
 
+\subsection{Results}
 
+TODO: description of what data slice we use.
+
+\emph{IMDB Dataset : Year 2006 - 2008}
+\begin{center}
+    \begin{tabular}{ | l | l | l | l |}
+    \hline
+    Algorithm & Nodes & Cliques & Runtime \\ \hline
+    $strong\_4clique\_finder$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder+$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder++$ & 11 & 22 & xx \\ \hline
+    \end{tabular}
+\end{center}
+
+\emph{IMDB Dataset : Year 2005 - 2008}
+\begin{center}
+    \begin{tabular}{ | l | l | l | l |}
+    \hline
+    Algorithm & Nodes & Cliques & Runtime \\ \hline
+    $strong\_4clique\_finder$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder+$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder++$ & 11 & 22 & xx \\ \hline
+    \end{tabular}
+\end{center}
+
+When we extend the dataset beyond 2005, the graph grows to large to process within resonable time on regular laptops.
 
 \section{Conclusion}
 TODO: We can conclude....
