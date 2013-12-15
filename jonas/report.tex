@@ -39,8 +39,8 @@ A 4-clique consist of 4 actors where each actor-pair has played in the same movi
 \label{fig: 4clique example}
 \end{figure}
 
-We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theses is: Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on a cleaned IMDB dataset \cite{imdb}.
-Each node in the graph is an actor. An Edge is formed if two actors have stared in the same movie. To define how strong the tie between these 2 actors is, we use the number of movies that they have stared in together as weight on the edge between them. For a 4-clique, the strength of the clique is defined as the median value of the edges in the clique.
+We want to provide a tool, for finding the cliques of 4 actors that have strong ties to one another. The theses is: Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on a cleaned IMDB dataset \cite{imdb}.
+Each node in the graph is an actor. An Edge is formed if two actors have stared in the same movie. To define how strong the tie between these 2 actors is, we use the number of movies that they have stared together as weight on the edge between them. For a 4-clique, the strength of the clique is defined as the median value of the edges in the clique.
 
 \subsection{Basic notations}
 We define the hollywood social network as an undirected simple graph G with vertices or nodes V and edges E. The number of vertices $|V| = n$ and $|E| = m$. An edge is often in this project written as $\langle v,u\rangle$, a triangle as $\langle v,u,w\rangle$ and a 4-clique as $\langle v,u,w,z\rangle$. The vertices in these so called cliques are all interconnected i.e. each pair is connected.
