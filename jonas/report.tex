@@ -49,15 +49,14 @@ We define a weight function $W(\langle v,u,w,z\rangle )$ for calculating how str
 
 We sometimes write $v_{adj}$ and this means the adjacent vertices of $v$.
 
-
-
 \section{A sequential algorithm}
-Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this project we just return one of the strongest 4-cliques.
+Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$ on page: \pageref{strong_clique}, $strong\_4clique\_finder+$ on page: \pageref{strong_clique_p} and $strong\_4clique\_finder++$ on page: \pageref{strong_clique_pp}. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this project we just return one of the strongest 4-cliques.
 
 \subsection{Naive first attempt}
 An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph G as input.
 
 \begin{algorithm}
+\label{strong_clique}
 \caption{$strong\_4clique\_finder$}
 \begin{algorithmic}
 \REQUIRE $G$
@@ -79,7 +78,6 @@ An intuitive first approach is the brute-force way. This algorithm simply checks
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
-\label{fig 2 : Strong 4 Clique finder}
 \end{algorithm}
 
 \subsubsection{Analysis}
@@ -92,6 +90,7 @@ Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast 
 We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles $T$. These are found by NodeIterator++ \cite{countingTriangles}.
 
 \begin{algorithm}
+\label{strong_clique_p}
 \caption{$strong\_4clique\_finder+$}
 \begin{algorithmic}
 \REQUIRE $G,T$
@@ -108,7 +107,6 @@ We see that if each node in a triangle has a common neighbour node this must clo
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
-\label{fig 3 : Strong 4 Clique finder+}
 \end{algorithm}
 
 \subsubsection{Analysis}
@@ -121,6 +119,7 @@ We seek to optimize the algorithm further as we wish to count each 4-clique only
 Schank \cite{AlgorithmicAspects} proposed that the lowest degree node in each triangle be “responsible” for making sure the triangle gets counted. From this we define a lower degree function.
 
 \begin{algorithm}
+\label{strong_clique_p_wd}
 \caption{$lower\_degree$}
 \begin{algorithmic}
 \REQUIRE $v,u$
@@ -132,12 +131,12 @@ Schank \cite{AlgorithmicAspects} proposed that the lowest degree node in each tr
 	\RETURN $False$
 \ENDIF
 \end{algorithmic}
-\label{fig 4 : Strong 4 Clique finder+ with lower degree check}
 \end{algorithm}
 
 We implement this degree function to the naive first algorithm so before iterating adjacent nodes we make sure that the lowest degree node is responsible for counting the possible 4-clique.
 
 \begin{algorithm}
+\label{strong_clique_pp}
 \caption{$strong\_4clique\_finder++$}
 \begin{algorithmic}
 \REQUIRE $G$
@@ -161,7 +160,6 @@ We implement this degree function to the naive first algorithm so before iterati
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
-\label{fig 5 : Strong 4 Clique finder++}
 \end{algorithm}
 
 \subsubsection{Analysis}
@@ -197,7 +195,7 @@ G = {426628_Arnold_Schwarzenegger : {
 
 \subsubsection{Results}
 
-The implemented algorithms are benchmarked to validate the intended performance enhancement. The first benchmark is performed on a small dataset. The dataset is then extended and benchmarked again.\newline
+The implemented algorithms are benchmarked to measure the running time for each version of the algorithm, hence giveing us the abillity to quantfy the performance enhancement through each iteration. The first benchmark is performed on a small dataset, the dataset is then extended and benchmarked again.\newline
 
 \textbf{IMDB Dataset : Year 2006 - 2008}
 \begin{center}
