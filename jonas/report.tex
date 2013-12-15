@@ -185,18 +185,16 @@ G = 426628_Arnold_Schwarzenegger : {
 \section{A parallel algorithm using MapReduce}
 
 \subsection{MapReduce basics}
-As is the algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run distributed and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the nedded functionality and enable us to traverse the entire graph in a resonable running time.
+The algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run in parallel and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the needed functionality and enable us to traverse the entire graph in a resonable running time.
 
 \subsubsection{Map function}
-The MapFunction build an associative array from the input and emits key, value paris.
+The input in the map function is processed 1 tuple at a time. This allows distributing different tuples over multiple machines and creates the opportunity for massive parallelization. Each mapper emits a key,value pair which is then passed on to the shuffle phase.
 
 \subsubsection{Shuffle}
-After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
+The shuffle phase collects all key,value pairs and aggregates the pairs that have same key together. Finally it sends them on to the reduce phase on the same physical machine.
 
 \subsubsection{Fold (Reduce) Function}
-The Reduce function unions the input data by counting the occurence of a given key and emmitning a single $<key,value>$ pair containing the input key and the number of occrurences the input.
-
-TODO: Shorter more precise
+The reducer processes each key along with all of its values associated with it together. In this step operations on data with a specific key are independent of data with other different keys which means that like in the map phase this step can be parallelized.
 
 \subsection{Finding strong 4cliques using MapReduce}
 We come with a suggestion for finding strong 4-cliques with MapReduce. It is strongly inspired from the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles we search for strong 4-cliques but using the same techinques as for triangle counting.
@@ -273,13 +271,13 @@ We use 4 parameters when analysing the mapreduce algorithm; round numbers, total
 As a mapreduce round can involve shuffling terabytes of data the number of rounds should remain constant or in the worst case logarithmic. In our case we stay at 3 rounds constantly.
 
 \paragraph{Work per reducer}
-The reducer with the worst running time. In our case we have round 2 and round 3 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(\sqrt[]{m}\sqrt[]{m})$ or just $O(m)$.
+The reducer with the worst running time. In our case we have round 1 and round 2 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(\sqrt[]{m}\sqrt[]{m})$ or just $O(m)$.
 
 \paragraph{Total work}
 The total work is the worst running for a round. Round 1 and round 2 are both $O(m)$ and the number of pairs to examine is the max number of edges $O(\sqrt[]{m})$ so in total $O(m\sqrt[]{m})$.
 
 \paragraph{Pair numbers}
-Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive.
+Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive. The max number of pairs are emitted from the reducer in round 1 and 2 and propogated by the next round mapper so the shuffling between round 1 and 2 and round 2 and 3 will receive pair numbers of $O(m\sqrt[]{m})$. The bound is calculated from the fact that the reducer receives $O(m)$ key,value pairs and each of these can have $O(\sqrt[]{m})$ adjacent nodes (or edge pairs in round 3).
 
 
 
