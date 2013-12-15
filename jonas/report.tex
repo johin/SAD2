@@ -173,13 +173,20 @@ For building the graph we use an adjacency list consisting of a dictionary with 
 
 \begin{lstlisting}
 
-G = 426628_Arnold_Schwarzenegger : {
- 		{451117_Sylvester_Stallone : 6 },
- 		{451117_Sylvester_Stallone : 6 },
- 		{452242_Jason_Statham : 2 },
- 		{277570_Jet_Li : 2 }
- 	}
-
+G = {426628_Arnold_Schwarzenegger : {
+ 		 {451117_Sylvester_Stallone : 6 },
+ 		 {452242_Jason_Statham : 2 },
+ 		 {277570_Jet_Li : 2 },
+ 		 { ... : ... }
+ 		}
+ 	},	
+	{287328_Dolph_Lundgren : {
+		 {451117_Sylvester_Stallone : 1 },
+		 {487218_Jean-Claude_Van Damme : 4},
+	 	 {277570_Jet_Li : 2 },
+	 	 { ... : ... }
+	 	}
+	}
  \end{lstlisting}
 
 \section{A parallel algorithm using MapReduce}
@@ -279,10 +286,43 @@ The total work is the worst running for a round. Round 1 and round 2 are both $O
 \paragraph{Pair numbers}
 Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive. The max number of pairs are emitted from the reducer in round 1 and 2 and propogated by the next round mapper so the shuffling between round 1 and 2 and round 2 and 3 will receive pair numbers of $O(m\sqrt[]{m})$. The bound is calculated from the fact that the reducer receives $O(m)$ key,value pairs and each of these can have $O(\sqrt[]{m})$ adjacent nodes (or edge pairs in round 3).
 
+\subsection{Results}
 
+The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.\newline
+
+\textbf{IMDB Dataset : Year 2006 - 2008}
+\begin{center}
+    \begin{tabular}{ | l | l | l | l |}
+    \hline
+    Algorithm & Nodes & Cliques & Runtime \\ \hline
+    $strong\_4clique\_finder$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder+$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder++$ & 11 & 22 & xx \\ \hline
+    \end{tabular}
+\end{center}
+
+\textbf{IMDB Dataset : Year 2005 - 2008}
+\begin{center}
+    \begin{tabular}{ | l | l | l | l |}
+    \hline
+    Algorithm & Nodes & Cliques & Runtime \\ \hline
+    $strong\_4clique\_finder$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder+$ & 11 & 22 & xx \\ \hline
+    $strong\_4clique\_finder++$ & 11 & 22 & xx \\ \hline
+    \end{tabular}
+\end{center}
+When we extend the dataset beyond 2005, the graph grows to large to process within resonable time on regular laptops.
 
 \section{Conclusion}
-TODO: We can conclude....
+
+\textbf{Results} \newline
+To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible.\newline
+
+\noindent \textbf{Runningtimes} \newline
+
+\noindent \textbf{Improvements} \newline
+
+\noindent TODO: We can conclude....
 Optimal running time for finding a strong 4cliques is...
 Maybe we could improve the space complexity by using something else than adjacency list?
 Add a heuristic: < 4 degree nodes are not necessary to examine (I AM NOT SURE.....)
