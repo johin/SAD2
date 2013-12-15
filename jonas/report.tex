@@ -176,6 +176,13 @@ We have implemented and compaired the sequential algorithms. The programming lan
 For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
 
 TODO: figure example!
+\lstset{numbers=left, language=Python, label=double dict}
+\begin{lstlisting}
+    G = {426628_Arnold_Schwarzenegger : {451117_Sylvester_Stallone : 6 }}
+    G = { ... : { ... : ... }}
+    G = { ... : { ... : ... }}  
+    G = {452242_Jason_Statham : {426628_Arnold_Schwarzenegger : 2 }}
+\end{lstlisting}
 
 
 
