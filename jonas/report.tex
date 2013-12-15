@@ -195,7 +195,7 @@ G = {426628_Arnold_Schwarzenegger : {
 As is the algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run distributed and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the nedded functionality and enable us to traverse the entire graph in a resonable running time.
 
 \subsubsection{Map function}
-The MapFunction build an associative array from the input and emits key, value paris.
+The Map function emits pairs of data. In our case to vertices and a special char that reprecents the vertex we are looking for to form a triangle eg. $<(u,\$):v>$
 
 \subsubsection{Shuffle}
 After the paris are emitted by the Map function, the paris are shuffled so that the match by key before they are injected into the Fold function.
@@ -292,7 +292,7 @@ Pair numbers describe the max number of pairs we map in a round. This is importa
 
 The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.\newline
 
-\emph{IMDB Dataset : Year 2006 - 2008}
+\textbf{IMDB Dataset : Year 2006 - 2008}
 \begin{center}
     \begin{tabular}{ | l | l | l | l |}
     \hline
@@ -303,7 +303,7 @@ The implemented algorithms are benchmarked agains eachother to validate the inte
     \end{tabular}
 \end{center}
 
-\emph{IMDB Dataset : Year 2005 - 2008}
+\textbf{IMDB Dataset : Year 2005 - 2008}
 \begin{center}
     \begin{tabular}{ | l | l | l | l |}
     \hline
@@ -317,14 +317,14 @@ When we extend the dataset beyond 2005, the graph grows to large to process with
 
 \section{Conclusion}
 
-\emph{Results}
-To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible.
+\textbf{Results} \newline
+To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible.\newline
 
-\emph{Runningtimes}
+\noindent \textbf{Runningtimes} \newline
 
-\emph{Improvements}
+\noindent \textbf{Improvements} \newline
 
-TODO: We can conclude....
+\noindent TODO: We can conclude....
 Optimal running time for finding a strong 4cliques is...
 Maybe we could improve the space complexity by using something else than adjacency list?
 Add a heuristic: < 4 degree nodes are not necessary to examine (I AM NOT SURE.....)
