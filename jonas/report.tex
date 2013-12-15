@@ -80,6 +80,7 @@ An intuitive first approach is the brute-force way. This algorithm simply checks
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
+\label{fig 2 : Strong 4 Clique finder}
 \end{algorithm}
 
 \subsubsection{Analysis}
@@ -108,6 +109,7 @@ We see that if each node in a triangle has a common neighbour node this must clo
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
+\label{fig 3 : Strong 4 Clique finder+}
 \end{algorithm}
 
 \subsubsection{Analysis}
@@ -131,6 +133,7 @@ Schank \cite{AlgorithmicAspects} proposed that the lowest degree node in each tr
 	\RETURN $False$
 \ENDIF
 \end{algorithmic}
+\label{fig 4 : Strong 4 Clique finder+ with lower degree check}
 \end{algorithm}
 
 We implement this degree function to the naive first algorithm so before iterating adjacent nodes we make sure that the lowest degree node is responsible for counting the possible 4-clique.
@@ -159,6 +162,7 @@ We implement this degree function to the naive first algorithm so before iterati
 \ENDFOR
 \RETURN $best\_clique$
 \end{algorithmic}
+\label{fig 5 : Strong 4 Clique finder++}
 \end{algorithm}
 
 \subsubsection{Analysis}
