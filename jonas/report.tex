@@ -178,10 +178,11 @@ For building the graph we use an adjacency list consisting of a dictionary with 
 TODO: figure example!
 \lstset{numbers=left, language=Python, label=double dict}
 \begin{lstlisting}
-    G = {426628_Arnold_Schwarzenegger : {451117_Sylvester_Stallone : 6 }}
-    {426628_Arnold_Schwarzenegger : {452242_Jason_Statham : 2 }}
-    { ... : { ... : ... }}  
-    {452242_Jason_Statham : {426628_Arnold_Schwarzenegger : 2 }}
+    G = {426628_Arnold_Schwarzenegger : { 
+    									 {451117_Sylvester_Stallone : 6 },
+    									 {452242_Jason_Statham : 2 },
+										 {277570_Jet_Li : 2 } 
+										}
 \end{lstlisting}
 
 
