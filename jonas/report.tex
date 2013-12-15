@@ -55,7 +55,7 @@ We sometimes write $v_{adj}$ and this means the adjacent vertices of $v$.
 Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this project we just return one of the strongest 4-cliques.
 
 \subsection{Naive first attempt}
-An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph V,E as input.
+An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph G as input.
 
 \begin{algorithm}
 \caption{$strong\_4clique\_finder$}
@@ -68,7 +68,7 @@ An intuitive first approach is the brute-force way. This algorithm simply checks
 			\IF{$w \in u_{adj}$}
 				\FOR{$z \in v_{adj}$}
 					\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$}
-						\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+						\IF{$W(v,u,w,z) > W(best\_clique)$}
 							\STATE $best\_clique = \langle v,u,w,z\rangle $
 						\ENDIF
 					\ENDIF
@@ -86,7 +86,7 @@ An intuitive first approach is the brute-force way. This algorithm simply checks
 In the worst case a vertex v will have $n-1$ adjacent vertices, so for every v we have $O(n^{3})$ resulting in a total running time of $O(n^{4})$. This is not an attractive result as this easily could end up never executing especially with massive graphs with large n and m. We also note that as we are checking every node in a clique for all possible combinations to define this clique we actually count the same clique $4! = 24$ times.
 
 \subsection{A better approach extending triangle counting}
-Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast algorithm for finding triangles in a graph. A triangle is close to a 4-clique we only need 1 node that in turn should be connected to all 3 nodes in the triangle.
+Looking at NodeIterator++ \cite{countingTriangles} we see an effective and fast algorithm for finding triangles in a graph. A triangle is close to a 4-clique, we only need 1 node that in turn should be connected to all 3 nodes in the triangle.
 
 \subsubsection{Intersection idea}
 We see that if each node in a triangle has a common neighbour node this must close a 4-clique. So by intersecting the adjacent vertices of each vertex in a triangle and run through this intersection list, we can check for strong 4-cliques. Besides taking a graph as input this algorithm also needs a list of triangles $T$. These are found by NodeIterator++ \cite{countingTriangles}.
@@ -100,7 +100,7 @@ We see that if each node in a triangle has a common neighbour node this must clo
 	\STATE $intersection\_list = intersect(v_{adj}, u_{adj}, w_{adj})$
 	\IF{$intersection\_list > 0$}
 		\FOR{$z \in intersection\_list$}
-			\IF{$W(G,v,u,w,z) > W(best\_clique)$}
+			\IF{$W(v,u,w,z) > W(best\_clique)$}
 				\STATE $best\_clique = \langle v,u,w,z\rangle $
 			\ENDIF
 		\ENDFOR
@@ -144,11 +144,11 @@ We implement this degree function to the naive first algorithm so before iterati
 \STATE $best\_clique = \langle empty\rangle $
 \FOR{$v \in V$}
 	\FOR{$u \in v_{adj}$}
-		\IF{$lower\_degree(G,v,u)$}
+		\IF{$lower\_degree(v,u)$}
 			\FOR{$w \in v_{adj}$}
-				\IF{$w \in u_{adj}$ \AND $lower\_degree(G,u,w)$}
+				\IF{$w \in u_{adj}$ \AND $lower\_degree(u,w)$}
 					\FOR{$z \in v_{adj}$}
-						\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$ \AND $lower\_degree(G,w,z)$}
+						\IF{$z \in w_{adj}$ \AND $z \in u_{adj}$ \AND $lower\_degree(w,z)$}
 							\IF{$W(G,v,u,w,z) > W(best\_clique)$}
 								\STATE $best\_clique = \langle v,u,w,z\rangle $
 							\ENDIF
@@ -169,7 +169,7 @@ It can be proved that when using the lowest degree responsibility trick a vertex
 
 
 \subsection{Implementation and results}
-We have implemented and compaired the sequential algorithms. The programming language used is Python 2.7 and the code is available at github TODO: REFERENCE.
+We have implemented and compaired the sequential algorithms. The programming language used is Python 2.7 and the code is available at github \cite{gitcode}.
 
 \subsubsection{Dataset and datastructure}
 For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
@@ -194,7 +194,7 @@ G = {426628_Arnold_Schwarzenegger : {
 
 \subsubsection{Results}
 
-The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.\newline
+The implemented algorithms are benchmarked to validate the intended performance enhancement. The first benchmark is performed on a small dataset. The dataset is then extended and benchmarked again.\newline
 
 \textbf{IMDB Dataset : Year 2006 - 2008}
 \begin{center}
