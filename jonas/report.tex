@@ -168,6 +168,27 @@ It can be proved that when using the lowest degree responsibility trick a vertex
 \subsection{Implementation and results}
 We have implemented and compaired the sequential algorithms. The programming language used is Python 2.7 and the code is available at github TODO: REFERENCE.
 
+\subsubsection{Dataset and datastructure}
+For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
+
+\begin{lstlisting}
+
+G = {426628_Arnold_Schwarzenegger : {
+ 		 {451117_Sylvester_Stallone : 6 },
+ 		 {452242_Jason_Statham : 2 },
+ 		 {277570_Jet_Li : 2 },
+ 		 { ... : ... }
+ 		}
+ 	},	
+	{287328_Dolph_Lundgren : {
+		 {451117_Sylvester_Stallone : 1 },
+		 {487218_Jean-Claude_Van Damme : 4},
+	 	 {277570_Jet_Li : 2 },
+	 	 { ... : ... }
+	 	}
+	}
+ \end{lstlisting}
+
 \subsubsection{Results}
 
 The implemented algorithms are benchmarked agains eachother to validate the intended performance enhancement. The first benchmark is performed on a small dataset, afterwards the dataset is extended and the benchmark are run again.\newline
@@ -194,27 +215,6 @@ The implemented algorithms are benchmarked agains eachother to validate the inte
     \end{tabular}
 \end{center}
 When we extend the dataset beyond 2005, the graph grows to large to process within resonable time on regular laptops.
-
-\subsubsection{Dataset and datastructure}
-For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
-
-\begin{lstlisting}
-
-G = {426628_Arnold_Schwarzenegger : {
- 		 {451117_Sylvester_Stallone : 6 },
- 		 {452242_Jason_Statham : 2 },
- 		 {277570_Jet_Li : 2 },
- 		 { ... : ... }
- 		}
- 	},	
-	{287328_Dolph_Lundgren : {
-		 {451117_Sylvester_Stallone : 1 },
-		 {487218_Jean-Claude_Van Damme : 4},
-	 	 {277570_Jet_Li : 2 },
-	 	 { ... : ... }
-	 	}
-	}
- \end{lstlisting}
 
 \section{A parallel algorithm using MapReduce}
 

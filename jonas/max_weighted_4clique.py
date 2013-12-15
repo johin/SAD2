@@ -8,7 +8,7 @@ USE_CACHE = False
 
 SQL_GET_ALL_MOVIES = """
 	SELECT id FROM movies
-	WHERE year > 2005
+	WHERE year >= 2005
 """
 
 SQL_GET_ROLES_OF_MOVIE = """
@@ -234,13 +234,13 @@ print "Running algorithm..."
 start_time = time.time()
 
 # NAIVE
-#cliques = naive_max_edgeweighted_4clique(graph)
+cliques = naive_max_edgeweighted_4clique(graph)
 
 # OPTIMIZED
 #cliques = optimized_max_edgeweighted_4clique(graph)
 
 # OPTIMAL
-cliques = node_iterator_plus_plus_extension_4cliques(graph)
+#cliques = node_iterator_plus_plus_extension_4cliques(graph)
 
 print "Algorithm execution time: " + str(time.time() - start_time)
 
