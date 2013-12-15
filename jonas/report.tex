@@ -8,6 +8,7 @@
 \usepackage{mathtools}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\lstset{language=Python}
 
 \renewcommand{\algorithmicforall}{\textbf{for each}}
 
@@ -26,11 +27,6 @@ To get the best interview with the chance of best trivia, the journalist at the 
 \subsection{Hollywood as a social network}
 A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. Friends, collegues, Home city or common interests.
 The growth rate of a social network is commenly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered as a social network of actors tied together by the movies they play together.
-
-\noindent A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. The members Home city, Employer or common interests. Social graphs tends to grow rapidly as each new node in the graph often has community of it's own, some inside the global social network and some outside the global network as the node is included in the network parts of the community outside the golbal network tends to join as well. Each one with their communities and so on. This quickly leads to very large amounts of data not suiteable for analysis om commodity hardware or powerfull server nodes.
-
-TODO: Shorter, more precise
-
 
 \subsection{Finding strong 4-cliques}
 A 4-clique consist of 4 actors where each actor-pair has played in the same movie. e.g. 
@@ -175,15 +171,17 @@ We have implemented and compaired the sequential algorithms. The programming lan
 \subsubsection{Dataset and datastructure}
 For building the graph we use an adjacency list consisting of a dictionary with vertices as keys and dictionaries as values. The value dictionaries have the adjacent vertices of the particular vertex as keys and their edge weight as values. The keys of the dictionaries are constructed with an actors id, firstname and lastname e.g. $actorid\_firstname\_lastname$.
 
-TODO: figure example!
-\lstset{numbers=left, language=Python, label=double dict}
 \begin{lstlisting}
-    G = {426628_Arnold_Schwarzenegger : { 
-    									 {451117_Sylvester_Stallone : 6 },
-    									 {452242_Jason_Statham : 2 },
-										 {277570_Jet_Li : 2 } 
-										}
-\end{lstlisting}
+
+G = 426628_Arnold_Schwarzenegger : {
+ 		{451117_Sylvester_Stallone : 6 },
+ 		{451117_Sylvester_Stallone : 6 },
+ 		{452242_Jason_Statham : 2 },
+ 		{277570_Jet_Li : 2 }
+ 	}
+
+ \end{lstlisting}
+
 
 
 
