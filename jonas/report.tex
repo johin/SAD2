@@ -49,8 +49,6 @@ We define a weight function $W(\langle v,u,w,z\rangle )$ for calculating how str
 
 We sometimes write $v_{adj}$ and this means the adjacent vertices of $v$.
 
-
-
 \section{A sequential algorithm}
 Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$ on page: \pageref{strong_clique}, $strong\_4clique\_finder+$ on page: \pageref{strong_clique_p} and $strong\_4clique\_finder++$ on page: \pageref{strong_clique_pp}. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this project we just return one of the strongest 4-cliques.
 
@@ -194,7 +192,7 @@ G = {426628_Arnold_Schwarzenegger : {
 
 \subsubsection{Results}
 
-The implemented algorithms are benchmarked to validate the intended performance enhancement. The first benchmark is performed on a small dataset. The dataset is then extended and benchmarked again.\newline
+The implemented algorithms are benchmarked to measure the running time for each version of the algorithm, hence giveing us the abillity to quantfy the performance enhancement through each iteration. The first benchmark is performed on a small dataset, the dataset is then extended and benchmarked again.\newline
 
 \textbf{IMDB Dataset : Year 2006 - 2008}
 \begin{center}
