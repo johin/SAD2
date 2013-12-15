@@ -26,34 +26,33 @@ To get the best interview with a possible best trivia, the journalist at the awa
 
 \subsection{Hollywood as a social network}
 A social network has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. friends, collegues, home city or common interests.
-The growth rate of a social networks density is commonly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered a social network of actors tied together by the movies they have appeared in together.
+The growth rate of a social networks density is commonly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment the Hollywood sceene is considered a social network of actors tied together by the movies they have appeared in together.
 
 \subsection{Finding strong 4-cliques}
-A 4-clique consist of 4 actors where each actor-pair has played in the same movie. e.g. 
+A 4-clique consist of 4 actors where each actor-pair has played in the same movie as shown in figure \ref{fig: 4clique example}.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale=0.45]{graph_4clique.png}
 \end{center}
 \caption{\small {\it {4 clique example}}} 
-\label{fig:4 clique example}
+\label{fig: 4clique example}
 \end{figure}
 
-We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theises is: stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on the IMDB databse filtered for null records and the adult industry.
-Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie.
-To define how strong the tie between two actors is, we use the number of movies that they have stared in together as weight on the edge between them, for the 4-clique the strength of the clique is defined as the mean value of the edges in the clique
+We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theses is: Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on a cleaned IMDB dataset \cite{imdb}.
+Each node in the graph is an actor. An Edge is formed if two actors have stared in the same movie. To define how strong the tie between these 2 actors is, we use the number of movies that they have stared in together as weight on the edge between them. For a 4-clique, the strength of the clique is defined as the median value of the edges in the clique.
 
 \subsection{Basic notations}
-We define the hollywood social network as an undirected simple graph G with vertices or nodes V and edges E. The number of vertices $|V| = n$ and $|E| = m$. The edges have weights corresponding to the number of times 2 actors (the 2 vertices) have played together. An edge is defined as $\langle v,u\rangle$, a triangle as $\langle v,u,w\rangle$ and a 4-clique as $\langle v,u,w,z\rangle$. The vertices in these so called cliques are all interconnected i.e. each pair is connected.
+We define the hollywood social network as an undirected simple graph G with vertices or nodes V and edges E. The number of vertices $|V| = n$ and $|E| = m$. An edge is often in this project written as $\langle v,u\rangle$, a triangle as $\langle v,u,w\rangle$ and a 4-clique as $\langle v,u,w,z\rangle$. The vertices in these so called cliques are all interconnected i.e. each pair is connected.
 
 We define a weight function $W(\langle v,u,w,z\rangle )$ for calculating how strong a 4-clique is. It simply returns the median of the edge weights (6 edge weights in a 4-clique).
 
-We sometime write $v_{adj}$ and this means the adjacent vertices of $v$.
+We sometimes write $v_{adj}$ and this means the adjacent vertices of $v$.
 
 
 
 \section{A sequential algorithm}
-Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this case we just return one of the strongest 4-cliques.
+Developing a fast algorithm for finding strong 4-cliques has been an iterative process and we present 3 algorithms resulting from this; $strong\_4clique\_finder$, $strong\_4clique\_finder+$ and $strong\_4clique\_finder++$. In all algorithms we keep track of the strongest clique throughout the computation and return it afterwards. There could exist 4-cliques with same weight - in this project we just return one of the strongest 4-cliques.
 
 \subsection{Naive first attempt}
 An intuitive first approach is the brute-force way. This algorithm simply checks for each vertex v in the graph if 3 adjacent nodes of v are interconnected i.e. there is a path between every node. The algorithm needs a graph V,E as input.
@@ -234,7 +233,7 @@ The shuffle phase collects all key,value pairs and aggregates the pairs that hav
 \subsubsection{Fold (Reduce) Function}
 The reducer processes each key along with all of its values associated with it together. In this step operations on data with a specific key are independent of data with other different keys which means that like in the map phase this step can be parallelized.
 
-\subsection{Finding strong 4cliques using MapReduce}
+\subsection{Finding strong 4-cliques using MapReduce}
 We come with a suggestion for finding strong 4-cliques with MapReduce. It is strongly inspired from the improved MapReduce triangle counting algorithm from lecture slides on MapReduce \cite{lnMapReduce} and from MR-NodeIterator++ \cite{countingTriangles}. We basically extend the algorithm so instead of counting the triangles we search for strong 4-cliques but using the same techinques as for triangle counting.
 
 \subsubsection{Suggestion for an algorithm}
@@ -336,15 +335,10 @@ Datastructure calculating degree - only possible this way with a data set that c
 
 \begin{thebibliography}{1}
 
-\bibitem{socialnetworkwiki}
-    wikipedia:
-    \emph{Social network}
-    \url{http://en.wikipedia.org/wiki/Social_network}
-
-\bibitem{socialgraphwiki}
-    wikipedia:
-    \emph{Social graph}
-    \url{http://en.wikipedia.org/wiki/Social_graph}
+\bibitem{imdb}
+    Rasmus Pagh and Francesco Silvestri
+    \emph{Description of the IMDb and MovieLens datasets}
+    \url{https://blog.itu.dk/SAD2-E2013/files/2013/10/datasets.pdf}
 
 \bibitem{lnMapReduce}
     Lecture notes: MapReduce
@@ -360,6 +354,11 @@ Datastructure calculating degree - only possible this way with a data set that c
     Thomas Schank
     \emph{Algorithmic Aspects of Triangle-Based Network Analysis}
     \url{http://digbib.ubka.uni-karlsruhe.de/volltexte/documents/4541}
+
+\bibitem{gitcode}
+    Thomas Snaidero, Jesper Jensen and Jonas Hinge
+    \emph{Python code for sequential algorithms for finding 4-cliques}
+    \url{https://github.com/jplay83/SAD2/blob/master/jonas/max_weighted_4clique.py}
     
 \end{thebibliography}
 
