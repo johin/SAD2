@@ -312,30 +312,16 @@ As a mapreduce round can involve shuffling terabytes of data the number of round
 The reducer with the worst running time. In our case we have round 1 and round 2 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(\sqrt[]{m}\sqrt[]{m})$ or just $O(m)$.
 
 \paragraph{Total work}
-The total work is the worst running for a round. Round 1 and round 2 are both $O(m)$ and the number of pairs to examine is the max number of edges $O(\sqrt[]{m})$ so in total $O(m\sqrt[]{m})$.
+The total work is the worst running time for a round. Round 1 and round 2 are both $O(m)$ and the number of pairs to examine is the max number of edges $O(\sqrt[]{m})$ so in total $O(m\sqrt[]{m})$.
 
 \paragraph{Pair numbers}
 Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive. The max number of pairs are emitted from the reducer in round 1 and 2 and propogated by the next round mapper so the shuffling between round 1 and 2 and round 2 and 3 will receive pair numbers of $O(m\sqrt[]{m})$. The bound is calculated from the fact that the reducer receives $O(m)$ key,value pairs and each of these can have $O(\sqrt[]{m})$ adjacent nodes (or edge pairs in round 3).
 
 \section{Conclusion}
+We have in this project explored different ways of constructing algorithms that returns the strongest 4-cliques in a graph. After 3 iterations we developed a sequential algorithm that is optimal in the sense that it only counts the 4-cliques 1 time each. We discovered a running time of $O(m^{2})$ running this algorithm. For this we use $O(mn)$ space and by implementing and testing this we quickly discovered that bigger machines are required and must importantly multiple machines i.e. we need to parallelize the algorithm.
+We then gave a suggestion for a parallel algorithm using MapReduce. Assuming the algorithm will work in practice we analyzed the algorithm and found complexities of the following parameters; round numbers: 3, work per reducer: $O(m)$, total work: $O(m\sqrt[]{m})$ and pair numbers: $O(m\sqrt[]{m})$.
+For future improvements one could consider using the edge weights to construct a heuristic that can prune some of the edges and decrease the amount of data.
 
-\textbf{Results} \newline
-We have in this project explored different ways of constructing algorithms that returns the strongest 4-cliques in a graph. After 3 iterations we developed a sequential algorithm that is optimal in the sense that it only counts the 4-cliques 1 time each. It had a time complexity of 
-
-RESULTS...
-To benchmark further we would obvious need more hardware, this would only be a shortterm solution, Xeon platform servers with 16 ,32 or 128GB of memory would come up short, at this point implementation of our MapReduce algorithms would be a solution that we could benefit from. If we were to utilize our laptops as well as Xeon based servers to the full potiential we need to parallize the algorithms where possible.\newline
-
-\noindent \textbf{Runningtimes} \newline
-
-\noindent \textbf{Improvements} \newline
-
-\noindent TODO: We can conclude....
-Optimal running time for finding a strong 4cliques is...
-Maybe we could improve the space complexity by using something else than adjacency list?
-Add a heuristic: < 4 degree nodes are not necessary to examine (I AM NOT SURE.....)
-Could the weights be included in the determination faces of the algorithms?
-degree weights when building the graph vs. calculating it while computing
-Datastructure calculating degree - only possible this way with a data set that can fit into memory
 
 \begin{thebibliography}{1}
 
