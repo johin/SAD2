@@ -20,13 +20,12 @@
 \maketitle
 
 \section{Introduction}
-TODO: JESPER
 The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
+To get the best interview with the chance of best trivia, the journalist at the awards needs some sort of list of who is connected to how and how close they are connected. The who is who of Hollywood and how tightly knit an actor is to other actors has some resemblance to a social network.
 
 \subsection{Hollywood as a social network}
-The term social network dates back to the late 1800s, both Émile Durkheim and Ferdinand Tönnies foreshadowed the idea of social networks in their theories and research of social groups. Tönnies argued that social groups can exist as personal and direct social ties that either link individuals who share values and belief (Gemeinschaft, German, commonly translated as "community") or impersonal, formal, and instrumental social links (Gesellschaft, German, commonly translated as "society").
-
-\noindent Today, the term social network has become more common and more specific, multiple service providers delivers social networking both based on community and society eg. Linkedin, Google+, Facebook, Twitter, Instagram and many more. Speaking at the Facebook f8 event in May 2007, CEO Mark Zuckerberg used the term "social graph" to refer to the network of connections and relationships between site users. Zuckerberg said that \textit{ "it's the reason Facebook works". He went on to say the social graph is "changing the way the world works... As Facebook adds more and more people with more and more connections, it continues growing and becomes more useful at a faster rate"}. \cite{socialgraphwiki}
+A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. Friends, collegues, Home city or common interests.
+The growth rate of a social network is commenly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered as a social network of actors tied together by the movies they play together.
 
 \noindent A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. The members Home city, Employer or common interests. Social graphs tends to grow rapidly as each new node in the graph often has community of it's own, some inside the global social network and some outside the global network as the node is included in the network parts of the community outside the golbal network tends to join as well. Each one with their communities and so on. This quickly leads to very large amounts of data not suiteable for analysis om commodity hardware or powerfull server nodes.
 
@@ -34,12 +33,19 @@ TODO: Shorter, more precise
 
 
 \subsection{Finding strong 4-cliques}
-TODO: JESPER
-A 4clique consist of 4 actors where each actor-pair has played in the same movie. e.g. TODO: figure with real names...
-\noindent We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. Stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood all inclusive, this graph will form a social network of actors based on the following.
-Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie. To define how strong the tie between two actors, we use the number of movies that they have stared in together as weight on the edge between them.
+A 4-clique consist of 4 actors where each actor-pair has played in the same movie. e.g. 
 
-TODO: Introduce our thoughts about 4-cliques and weight as a strongness parameter
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.45]{graph_4clique.png}
+\end{center}
+\caption{\small {\it {4 clique example}}} 
+\label{fig:4 clique example}
+\end{figure}
+
+We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theises is: stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on the IMDB databse filtered for null records and the adult industry.
+Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie.
+To define how strong the tie between two actors is, we use the number of movies that they have stared in together as weight on the edge between them, for the 4-clique the strength of the clique is defined as the mean value of the edges in the clique
 
 \subsection{Basic notations}
 We define the hollywood social network as an undirected simple graph G with vertices or nodes V and edges E. The number of vertices $|V| = n$ and $|E| = m$. The edges have weights corresponding to the number of times 2 actors (the 2 vertices) have played together. An edge is defined as $\langle v,u\rangle$, a triangle as $\langle v,u,w\rangle$ and a 4-clique as $\langle v,u,w,z\rangle$. The vertices in these so called cliques are all interconnected i.e. each pair is connected.
@@ -176,11 +182,7 @@ TODO: figure example!
 \section{A parallel algorithm using MapReduce}
 
 \subsection{MapReduce basics}
-TODO: JESPER
-Network analysis of eg. interconnected networks like the Internet for web pages and meta data to build a search engine or of a social network like Facebook, twitter or Instagram provides a challenge for even high power servers. To solve this problem Google engineers founded and implemented MapReduce. MapReduce is a programming model inspired by functional programming founded in the 60's. It's designed for large-scale data processing and designed to run on clusters of commodity hardware hence it does not require high power servers or HPC clusters to run.
-In more details, MapReduce is a programming framework that provides the capability of cluster computations. MapReduce keeps track of synchronization and data across the clusters, this eases the burden of the programmers and makes it's easier than maltreated programming to implement.
-
-\noindent MapReduce accepts other functions as arguments for further decomposition of problem. The two main functions in MapReduce is the Map function and the Fold / Reduce function, in between the Map and the Recude a shuffeling actions is executed to allign the keys for each Reduce function so that one Reduce function handles one key.
+As is the algorithms that we have provieded are not able to process the entire graph due to memory exhaustion. To process the full dataset we will need an algorithmic approach that can run distributed and traverse large datasets without hitting the upper memory barrier. MapReduce is a framework that wil provide the nedded functionality and enable us to traverse the entire graph in a resonable running time.
 
 \subsubsection{Map function}
 The MapFunction build an associative array from the input and emits key, value paris.
@@ -200,7 +202,7 @@ We come with a suggestion for finding strong 4-cliques with MapReduce. It is str
 The idea of the algorithm is basically the same as for the sequntial $strong\_4clique\_finder++$ algorithm but now, in order to distribute data from the graph to different machines, we split up the computations into 3 map/reduce iterations or rounds. For emitting and receiving the data we use key/value pairs e.g. $\langle vertex1,vertex2\rangle :\$$ where the key is an edge pair. The $\$$ sign defines a possible value.
 
 \paragraph{Round 1}
-In the first round we map edges from the graph, but using the lowest degree function we ensure that we only emit the same edge once e.g. $\langle v,u\rangle$ and not $\langle u,v\rangle$ assuming that in this case $v$ has a lower degree than $u$. We also emit a key/value pair $\langle v,\$\rangle :u$ where the key is a possible edge pair and $u$ is an adjacent node. In this way we make $v$, the lowest degree node, responsible for finding a node that closes the triangle and later on the 4-clique. After some shuffling the reducer will receive a list of adjacent nodes for one possible edge $\langle v,\$\rangle$ and from this list we emit paths e.g. $\langle x,y\rangle :v$ and again make sure that we don't emit the same edge twice this time using $id_x < id_y$. If the value is $\$$ we just propogate the key/value pair to the next round.
+In the first round we map edges from the graph, but using the lowest degree function we ensure that we only emit the same edge once e.g. $\langle v,u\rangle$ and not $\langle u,v\rangle$ assuming that in this case $v$ has a lower degree than $u$. We also emit a key/value pair $\langle v,\$\rangle :u$ where the key is a possible edge pair and $u$ is an adjacent node. In this way we make $v$, the lowest degree node, responsible for finding a node that closes the triangle and later on the 4-clique. After some shuffling the reducer will receive a list of adjacent nodes for one possible edge $\langle v,\$\rangle$ and from this list we emit paths e.g. $\langle x,y\rangle :v$ and again make sure that we don't emit the same edge twice using $lower\_degree(x,y)$. By doing this we also ensure that the ordering of $v,u$ is the same as the emitted $emit(\langle v,u\rangle :\$)$ as these keys needs to match in order to collect adjacent values in a list in the following rounds. If the value is $\$$ we just propogate the key/value pair to the next round.
 
 \paragraph{Round 2}
 We simply propogate the pairs in the mapping phase of round 2. In the reducer we check that the pairs emitted from round 1 is actually connected. This is done by removing and propogating the $\$$ from the pair $\langle v,u\rangle$ and if there are still values left, these are the vertices that connects to both vertices in the pair i.e. they close a triangle. We then iterate as in round 1 through these adjacent nodes and emit possible pairs, only this time with the key pair as value e.g. $\langle x,y \rangle :\langle v,u \rangle$.
@@ -217,19 +219,19 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 \REQUIRE MAP 1: $\langle v,u\rangle :\$$
 	\IF{$lower\_degree(v,u)$}
 		\STATE $emit(\langle v,\$\rangle :u)$
-		\STATE $emit(\langle v,u>\rangle \$)$
+		\STATE $emit(\langle v,u\rangle :\$)$
 	\ENDIF
 \REQUIRE REDUCE 1: $\langle v,u\rangle :u_{adj} = [u_1,u_2,...]$
 	\IF{$u != \$$}
-		\STATE $emit(\langle v,u \rangle:\$)$
-		\FOR{$x \in u_{adj}$}
-			\FOR{$y \in u_{adj}$}
-				\IF{$id_x < id_y$}
-					\STATE $emit(\langle x,y\rangle :v)$
-				\ENDIF
-			\ENDFOR
-		\ENDFOR
+		\STATE $emit(\langle v,u\rangle :\$)$
 	\ENDIF
+	\FOR{$x \in u_{adj}$}
+		\FOR{$y \in u_{adj}$}
+			\IF{$lower\_degree(x,y)$}
+				\STATE $emit(\langle x,y\rangle :v)$
+			\ENDIF
+		\ENDFOR
+	\ENDFOR
 
 \REQUIRE MAP 2: $\langle v,u\rangle :w$
 	\STATE $emit(\langle v,u\rangle :w)$
@@ -262,7 +264,17 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 \end{algorithm}
 
 \subsubsection{Analysis}
+We use 4 parameters when analysing the mapreduce algorithm; Round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$.
 
+\paragraph{Round numbers}
+As a mapreduce round can involve shuffling terabytes of data the number of rounds should remain constant or in the worst case logarithmic. In our case we stay at 3 rounds constantly.
+
+\paragraph{Total work}
+The total work is the sum of the worst running time for each round. 
+
+\paragraph{Work per reducer}
+
+\paragraph{Pair numbers}
 
 
 TODO: Number of rounds, time complexity etc...
