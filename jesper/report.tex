@@ -20,22 +20,27 @@
 \maketitle
 
 \section{Introduction}
-TODO: JESPER
 The Academy awards is covered by thousands of journalist from all over the world, all of them competing for the best interviews. But what actors are the best fit for an interview and what actors could provide the best trivia?
+To get the best interview with the chance of best trivia, the journalist at the awards needs some sort of list of who is connected to how and how close they are connected. The who is who of Hollywood and how tightly knit an actor is to other actors has some resemblance to a social network.
 
 \subsection{Hollywood as a social network}
 A social networks has multiple communities that ties the members of a social network together. The ties are based on one or more denominator eg. Friends, collegues, Home city or common interests.
-The growth rate of a social network is very fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered as a social network of actors tied together by the movies they play together.
-
+The growth rate of a social network is commenly fast as every new node often is connected to a node already in the network and often bring adjacent nodes in to the network. In this assignment The Hollywood sceene is considered as a social network of actors tied together by the movies they play together.
 
 \subsection{Finding strong 4-cliques}
 A 4-clique consist of 4 actors where each actor-pair has played in the same movie. e.g. 
 
-TODO: figure with real names...
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.45]{graph_4clique.png}
+\end{center}
+\caption{\small {\it {4 clique example}}} 
+\label{fig:4 clique example}
+\end{figure}
 
-We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theises is: stronger ties provides better gossip and stories from their clique. In order to find these cliques, we constuct a graph of the actors in Hollywood, this graph will form a social network of actors based on the following.
+We want to provide a tool for finding the cliques of 4 actors that have strong ties to one another. The theises is: stronger ties provides better gossip and stories from their clique. In order to find these cliques, we traverse the "social network" of Hollywood. This network is based on the IMDB databse filtered for null records and the adult industry.
 Each node in the graph is an actor, an Edge is formed if two actors have stared in the same movie.
-To define how strong the tie between two actors is, we use the number of movies that they have stared in together as weight on the edge between them.
+To define how strong the tie between two actors is, we use the number of movies that they have stared in together as weight on the edge between them, for the 4-clique the strength of the clique is defined as the mean value of the edges in the clique
 
 \subsection{Basic notations}
 TODO: JONAS
