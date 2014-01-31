@@ -9,3 +9,4 @@ Reducer 1 work: m^3/2
 Map 2 work: constant work
 Reducer 2 work: m^5/2
 TotalWork = O(m^5/2)
+Pair numbers O(5/2)
