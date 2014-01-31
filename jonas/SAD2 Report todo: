@@ -1,0 +1,11 @@
+SAD2 Report todo:
+- Lure ud i beskrivelse af MR Runder
+- Fjernet lowerDegree check fra alt andet end MAP1
+- tilføj ID check xid < yid i stedet for lowerDegree check
+
+Noter:
+Map 1 work: 2* sqrt(m)
+Reducer 1 work: m^3/2
+Map 2 work: constant work
+Reducer 2 work: m^5/2
+TotalWork = O(m^5/2)
