@@ -13,7 +13,7 @@
 \renewcommand{\algorithmicforall}{\textbf{for each}}
 
 \title{The search for strong 4-cliques in Hollywood.}
-\author{Thomas Snaidero (tsna), Jesper Jensen (jejen), Jonas Hinge (jhin)}
+\author{Jesper Jensen (jejen), Jonas Hinge (jhin)}
 \date{December 2013}
 
 \begin{document}
@@ -271,7 +271,7 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 	\ENDIF
 	\FOR{$x \in u_{adj}$}
 		\FOR{$y \in u_{adj}$}
-			\IF{$lower\_degree(x,y)$}
+			\IF{$id_{x} < id_{y}$}
 				\STATE $emit(\langle x,y\rangle :v)$
 			\ENDIF
 		\ENDFOR
@@ -286,7 +286,7 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 	\ENDIF
 	\FOR{$x \in vu_{adj}$}
 		\FOR{$y \in vu_{adj}$}
-			\IF{$lower\_degree(x,y)$}
+			\IF{$id_{x} < id_{y}$}
 				\STATE $emit(\langle x,y\rangle :\langle v,u\rangle)$
 			\ENDIF
 		\ENDFOR
@@ -308,7 +308,9 @@ As for the last round we simply propogate pairs in the mapper of round 3. In the
 \end{algorithm}
 
 \subsubsection{Analysis}
-We use 4 parameters when analysing the mapreduce algorithm; round numbers, total work, work per reducer and pair numbers. We notice that by using the lower degree responsibility we reduce the size of possible adjacent vertices for a node to $O(\sqrt[]{m})$ according to the same proof \cite{AlgorithmicAspects} used in the sequential algorithm $strong\_4clique\_finder++$. In this way we also make sure that each 4-clique is only counted 1 time.
+There are many different operations happening in a mapreduce implementation and all these complexity measures leads to a difficult algorithmic analysis. We focus on 4 parameters when analyzing the mapreduce algorithm; round numbers, total work, work per reducer and total number of pairs.
+
+As in the sequential algorithm $strong\_4clique\_finder++$ we use the lower degree function in the mapper in round 1 so we reduce the number of possible edges emitted to $O(\sqrt[]{m})$ according to the proof \cite{AlgorithmicAspects}.
 
 \paragraph{Round numbers}
 As a mapreduce round can involve shuffling terabytes of data the number of rounds should remain constant or in the worst case logarithmic. In our case we stay at 3 rounds constantly.
@@ -317,14 +319,14 @@ As a mapreduce round can involve shuffling terabytes of data the number of round
 The reducer with the worst running time. In our case we have round 1 and round 2 as the worst rounds. They both double iterate through possible adjacent nodes so the running time is $O(\sqrt[]{m}\sqrt[]{m})$ or just $O(m)$.
 
 \paragraph{Total work}
-The total work is the worst running time for a round. Round 1 and round 2 are both $O(m)$ and the number of pairs to examine is the max number of edges $O(\sqrt[]{m})$ so in total $O(m\sqrt[]{m})$.
+This complexity measurement describes the total work for all mappers and reducers. The mapper in round 1 iterates through all edges and, using the lower degree trick, emits $O(\sqrt[]{m})$ key/value pairs so this will be the input for the reducer in round 1. This reducer double iterates through a nodes possible adjacent nodes so the output will be $O(m^{3/2})$ key/value pairs and as the mapper in round 2 simply emits these pairs the reducer in round 2 will receive these as input. Again we double iterate through a nodes possible adjacent nodes so the work and output will be $O(m^{5/2})$. In round 3 the mapper again simply emits pairs and the reducer will iterate through an edges possible connected edges so the total work is kept at $O(m^{5/2})$.
 
 \paragraph{Pair numbers}
-Pair numbers describe the max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive. The max number of pairs are emitted from the reducer in round 1 and 2 and propogated by the next round mapper so the shuffling between round 1 and 2 and round 2 and 3 will receive pair numbers of $O(m\sqrt[]{m})$. The bound is calculated from the fact that the reducer receives $O(m)$ key,value pairs and each of these can have $O(\sqrt[]{m})$ adjacent nodes (or edge pairs in round 3).
+Pair numbers describe the total max number of pairs we map in a round. This is important to keep as low as possible as the shuffling operation can be very expensive. The max number of pairs are emitted from the reducer in round 2, as described in the total work analysis. These pairs are propogated by the round 3 mapper so the shuffling between round 2 and 3 will receive the total pair numbers of $O(m^{5/2})$. This is also an expression of the space needed in the shuffling phase.
 
 \section{Conclusion}
 We have in this project explored different ways of constructing algorithms that returns the strongest 4-cliques in a graph. After 3 iterations we developed a sequential algorithm that is optimal in the sense that it only counts the 4-cliques 1 time each. We discovered a running time of $O(m^{2})$ running this algorithm. For this we use $O(mn)$ space and by implementing and testing this we quickly discovered that bigger machines are required and most importantly multiple machines i.e. we need to parallelize the algorithm.
-We then gave a suggestion for a parallel algorithm using MapReduce. Assuming the algorithm will work in practice we analyzed the algorithm and found complexities of the following parameters; round numbers: 3, work per reducer: $O(m)$, total work: $O(m\sqrt[]{m})$ and pair numbers: $O(m\sqrt[]{m})$.
+We then gave a suggestion for a parallel algorithm using MapReduce. Assuming the algorithm will work in practice we analyzed the algorithm and found complexities of the following parameters; round numbers: 3, work per reducer: $O(m)$, total work: $O(m^{5/2})$ and total pair numbers: $O(m^{5/2})$.
 For future improvements one could consider using the edge weights to construct a heuristic that can prune some of the edges and decrease the amount of data.
 
 
@@ -351,7 +353,7 @@ For future improvements one could consider using the edge weights to construct a
     \url{http://digbib.ubka.uni-karlsruhe.de/volltexte/documents/4541}
 
 \bibitem{gitcode}
-    Thomas Snaidero, Jesper Jensen and Jonas Hinge
+    Jesper Jensen and Jonas Hinge
     \emph{Python code for sequential algorithms for finding 4-cliques}
     \url{https://github.com/jplay83/SAD2/blob/master/jonas/max_weighted_4clique.py}
     
